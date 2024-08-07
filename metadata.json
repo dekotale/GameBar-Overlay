@@ -1,8 +1,8 @@
 {
-    "name": "GNOME GameBar",
+    "name": "GameBar Overlay",
     "description": "A fullscreen overlay widget for GNOME that displays useful information, audio controls and more.",
-    "uuid": "GNOME-GameBar@dekotale.github.io",
+    "uuid": "gamebar-overlay@dekotale.github.io",
     "shell-version": ["46"],
-    "url": "https://github.com/dekotale/GNOME-GameBar",
+    "url": "https://github.com/dekotale/GameBar-Overlay",
     "version": 1
 }

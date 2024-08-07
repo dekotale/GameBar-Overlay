@@ -1,4 +1,4 @@
-# GNOME GameBar
+# GameBar Overlay
 
 A fullscreen overlay widget for GNOME that displays useful information, audio controls and more.
 
@@ -12,7 +12,7 @@ A fullscreen overlay widget for GNOME that displays useful information, audio co
 
 ## Installation
 
-Just clone the repo into `~/.local/share/gnome-shell/extensions/` and enable the extension via GNOME Extensions app
+Just clone the repo into `~/.local/share/gnome-shell/extensions/gamebar-overlay@dekotale.github.io` and enable the extension via GNOME Extensions app or similar.
 
 ## Usage
 

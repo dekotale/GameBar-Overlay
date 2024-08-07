@@ -107,7 +107,7 @@ export default class GameBarExtension extends Extension {
         // Add a keybinding to toggle the visibility of the overlay widget
         Main.wm.addKeybinding(
             'toggle-gamebar', // Keybinding name
-            this.getSettings('org.gnome.shell.extensions.gnome-gamebar'), // Settings
+            this.getSettings('org.gnome.shell.extensions.gamebar-overlay'), // Settings
             Meta.KeyBindingFlags.NONE, // Flags
             Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW, // Action modes
             () => {

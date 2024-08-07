@@ -12,7 +12,6 @@ export class SoundControls {
         this._volumeIcon = null;
         this._appVolumesBox = null;
         this._stream = null;
-        this._separator = null;
         this._createVolumeControls();
     }
 
@@ -60,14 +59,7 @@ export class SoundControls {
             style_class: 'gamebar-volume-container-global'
         });
 
-        // Create the separator
-        this._separator = new St.DrawingArea({
-            style_class: 'separator',
-            x_expand: true
-        });
-
         volumeContainer.add_child(volumePanel);
-        //volumeContainer.add_child(this._separator);
         volumeContainer.add_child(this._appVolumesBox);
 
         // Add the volume container to the overlay
@@ -109,24 +101,24 @@ export class SoundControls {
                 y_align: Clutter.ActorAlign.CENTER
             });
 
-            //Create the separator element
-            let separator = new St.DrawingArea({
-                style_class: 'separator',
-                x_expand: true,
-            });
-
             // Add the separator for only first item
             if (index == 0) {
-                labelBox.add_child(separator);
+                labelBox.add_child(new St.DrawingArea({
+                    style_class: 'separator',
+                    x_expand: true,
+                }));
             }
         
             label.style_class = 'gamebar-app-volume-label';
             labelBox.add_child(label);
             labelBox.add_child(this._createAppVolumeControl(inputStream));
         
-            // Add the separator except for the first and last item
-            if (index < sinkInputs.length - 1 && index > 0) {
-                labelBox.add_child(separator);
+            // Add the separator except for the last item
+            if (index < sinkInputs.length - 1) {
+                labelBox.add_child(new St.DrawingArea({
+                    style_class: 'separator',
+                    x_expand: true,
+                }));
             }
         
             this._appVolumesBox.add_child(labelBox);
