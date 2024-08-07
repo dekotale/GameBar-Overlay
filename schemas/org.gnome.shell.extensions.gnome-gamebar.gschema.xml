@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.gnome-gamebar" path="/org/gnome/shell/extensions/gnome-gamebar/">
+    <key name="toggle-gamebar" type="as">
+      <default><![CDATA[['<Super>g']]]></default>
+      <summary>Keyboard shortcut to toggle the GameBar overlay</summary>
+      <description>Keyboard shortcut to show/hide the GameBar overlay</description>
+    </key>
+  </schema>
+</schemalist>
