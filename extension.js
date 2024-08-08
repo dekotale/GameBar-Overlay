@@ -86,9 +86,22 @@ class GameBar extends PanelMenu.Button {
         } else {
             // If not visible, show the overlay and update the clock and volume controls
             this._overlay.show();
-            this._clock.updateClock();
+            this._clock._updateClock();
             this._soundControls.updateVolumeControls();
         }
+    }
+
+    /**
+     * Destroys the GameBar extension.
+     * This method is called when the extension is disabled or being removed.
+     * It destroys the clock addon and calls the parent class's destroy method.
+     */
+    destroy() {
+        // Destroy the clock addon
+        this._clock.destroy();
+
+        // Call the parent class's destroy method
+        super.destroy();
     }
 });
 
@@ -126,6 +139,7 @@ export default class GameBarExtension extends Extension {
             this._button.destroy();
             this._button = null;
         }
+
         // Remove the keybinding
         Main.wm.removeKeybinding('toggle-gamebar');
     }
