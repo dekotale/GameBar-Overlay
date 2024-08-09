@@ -99,6 +99,10 @@ class GameBar extends PanelMenu.Button {
     destroy() {
         // Destroy the clock addon
         this._clock.destroy();
+        // Destroy the closeButton addon
+        this._closeButton.destroy();
+        // Destroy the soundControls addon
+        this._soundControls.destroy();
 
         // Call the parent class's destroy method
         super.destroy();

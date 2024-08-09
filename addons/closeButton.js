@@ -35,4 +35,10 @@ export class CloseButton {
 
         //TODO:: make close by clicking in a empty area selectable in configuration
     }
+
+    destroy() {
+        // Remove the close button from the overlay
+        this._overlay.remove_child(this._closeButton);
+        this._closeButton = null;
+    }
 }

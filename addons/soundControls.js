@@ -193,4 +193,12 @@ export class SoundControls {
         }
         this._volumeIcon.child.icon_name = iconName;
     }
+
+    destroy() {
+        this._overlay.remove_child(this._appVolumesBox);
+        this._volumeSlider = null;
+        this._volumeIcon = null;
+        this._appVolumesBox = null;
+        this._stream = null;
+    }
 }
