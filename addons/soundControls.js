@@ -2,6 +2,7 @@ import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import * as Volume from 'resource:///org/gnome/shell/ui/status/volume.js';
 import {Slider} from 'resource:///org/gnome/shell/ui/slider.js';
+import Gio from 'gi://Gio';
 
 export class SoundControls {
     constructor(overlay, primaryMonitor) {
@@ -12,6 +13,7 @@ export class SoundControls {
         this._volumeIcon = null;
         this._appVolumesBox = null;
         this._stream = null;
+        this._streams = null;
         this._createVolumeControls();
     }
 
@@ -70,6 +72,8 @@ export class SoundControls {
     updateVolumeControls() {
         // Get the default audio sink (main volume)
         this._stream = this._volumeControl.get_default_sink();
+        this._streams = this._volumeControl.get_streams(); //WIP to fix Icons name problem
+
         if (this._stream) {
             // Update the main volume slider
             this._volumeSlider.value = this._stream.volume / this._volumeControl.get_vol_max_norm();
@@ -126,6 +130,40 @@ export class SoundControls {
     }
 
     // Create a volume control for a specific app
+    _getAppIcon(stream) {
+        let icon = null;
+        let streamName = stream.get_name();
+    
+        // Check if the stream has an icon saved in system icons:
+        icon = this._getAppInfoIconFromStreamName(stream);
+        if (icon) return icon;
+
+        let iconName = stream.get_icon_name();
+        if (iconName) {
+            icon = new Gio.ThemedIcon({ name: iconName});
+            if (icon) return icon;
+        }
+    
+        // Return generic if no icon found:
+        return new Gio.ThemedIcon({ name: 'application-x-executable' });
+    }
+    
+    _getAppInfoIconFromStreamName(stream) {
+        let streamName = stream.get_name().toLowerCase();
+        let allApps = Gio.AppInfo.get_all();
+    
+        // Search for the app with the same name:
+        for (let app of allApps) {
+            if (app.get_display_name().toLowerCase() === streamName) {
+                let icon = app.get_icon();
+                if (icon) return icon;
+            }
+        }
+    
+        return null;
+    }
+    
+    // Create a volume control for a specific app
     _createAppVolumeControl(stream) {
         let container = new St.BoxLayout({
             style_class: 'gamebar-app-volume-control',
@@ -133,13 +171,15 @@ export class SoundControls {
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.CENTER
         });
-
+    
+        let icon = this._getAppIcon(stream);
+    
         // Create an icon for the app
-        let icon = new St.Icon({
+        let APPicon = new St.Icon({
             style_class: 'gamebar-app-volume-icon',
-            icon_name: stream.get_icon_name() || 'application-x-executable-symbolic'
+            gicon: icon
         });
-
+    
         // Create a volume slider for the app
         let slider = new Slider(stream.volume / this._volumeControl.get_vol_max_norm());
         slider.set_style('width: 300px;'); //TODO:: make configurable
@@ -147,13 +187,14 @@ export class SoundControls {
             stream.volume = slider.value * this._volumeControl.get_vol_max_norm();
             stream.push_volume();
         });
-
+    
         // Add all elements to the container
-        container.add_child(icon);
+        container.add_child(APPicon);
         container.add_child(slider);
-
+    
         return container;
     }
+    
 
     // Handle changes to the main volume slider
     _onVolumeChanged() {
