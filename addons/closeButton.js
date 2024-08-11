@@ -33,7 +33,14 @@ export class CloseButton {
         // Add the close button to the overlay
         this._overlay.add_child(this._closeButton);
 
-        //TODO:: make close by clicking in a empty area selectable in configuration
+        // TODO: configurable in preferences
+        // Add an event listener to close the overlay when clicking on an empty space
+        this._overlay.connect('button-release-event', (actor, event) => {
+            // Check if the overlay itself was clicked
+            if (actor === this._overlay) {
+                this._overlay.hide();
+            }
+        });
     }
 
     destroy() {
