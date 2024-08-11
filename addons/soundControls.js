@@ -132,7 +132,6 @@ export class SoundControls {
     // Create a volume control for a specific app
     _getAppIcon(stream) {
         let icon = null;
-        let streamName = stream.get_name();
     
         // Check if the stream has an icon saved in system icons:
         icon = this._getAppInfoIconFromStreamName(stream);
@@ -143,21 +142,61 @@ export class SoundControls {
             icon = new Gio.ThemedIcon({ name: iconName});
             if (icon) return icon;
         }
-    
+
         // Return generic if no icon found:
         return new Gio.ThemedIcon({ name: 'application-x-executable' });
     }
     
     _getAppInfoIconFromStreamName(stream) {
-        let streamName = stream.get_name().toLowerCase();
-        let allApps = Gio.AppInfo.get_all();
+        const cleanString = (str) => {
+            if (!str) return '';
+            return str.toLowerCase()
+                .replace(/[^\w\s]/g, '')
+                .replace(/\s+/g, '')
+                .replace(/browser|player|viewer/g, '');
+        };
     
-        // Search for the app with the same name:
+        const calculateMatchScore = (str1, str2) => {
+            const clean1 = cleanString(str1);
+            const clean2 = cleanString(str2);
+            if (clean1 === clean2) return 100;
+            if (clean1.includes(clean2)) return 75;
+            if (clean2.includes(clean1)) return 75;
+            return 0;
+        };
+    
+        const streamName = cleanString(stream.get_name());
+        const streamIconName = cleanString(stream.get_icon_name());
+        const allApps = Gio.AppInfo.get_all();
+    
+        let bestMatch = {
+            app: null,
+            score: 0
+        };
+    
         for (let app of allApps) {
-            if (app.get_display_name().toLowerCase() === streamName) {
-                let icon = app.get_icon();
-                if (icon) return icon;
+            const appName = cleanString(app.get_display_name());
+            const appId = cleanString(app.get_id());
+    
+            if (appName && streamName && stream.get_name()) {
+                const nameScore = Math.max(
+                    calculateMatchScore(appName, streamName),
+                    calculateMatchScore(appId, streamName),
+                    calculateMatchScore(appName, streamIconName),
+                    calculateMatchScore(appId, streamIconName)
+                );
+    
+                if (nameScore > bestMatch.score) {
+                    bestMatch = {
+                        app: app,
+                        score: nameScore
+                    };
+                }
             }
+        }
+    
+        if (bestMatch.app) {
+            return bestMatch.app.get_icon();
         }
     
         return null;
