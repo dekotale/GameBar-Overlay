@@ -60,17 +60,47 @@ class GameBar extends PanelMenu.Button {
             y_expand: true, // Expand vertically to fill the height of the parent
             visible: false // Start hidden
         });
-
-        // Set the size of the overlay widget to match the primary monitor
-        this._overlay.set_style(`width: ${primaryMonitor.width}px; height: ${primaryMonitor.height}px;`);
-
+        this._updateOverlayGeometry(Main.layoutManager.primaryMonitor);
         // Create instances of addons and pass the overlay widget and the primary monitor
         this._clock = new Clock(this._overlay, primaryMonitor); // Clock addon
         this._closeButton = new CloseButton(this._overlay, primaryMonitor); // Close button addon
         this._soundControls = new SoundControls(this._overlay, primaryMonitor); // Sound controls addon
 
         // Add the overlay widget to the layout manager to affect the input region
-        Main.layoutManager.addChrome(this._overlay, { affectsInputRegion: true });
+        Main.layoutManager.addChrome(this._overlay, { affectsInputRegion: true});
+    
+        // Connect to 'monitors-changed' signal to update overlay position and size
+        this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', () => {
+            this._updateOverlayGeometry(Main.layoutManager.primaryMonitor);
+        });
+
+        // Connect to 'session-mode-changed' signal to update overlay visibility in some situations
+        this._sessionModeChangedId = Main.sessionMode.connect('updated', () => {
+            this._onSessionModeChanged();
+        });
+    }
+
+    //Update overlay geometry
+    _updateOverlayGeometry(primaryMonitor) {
+        this._overlay.set_position(primaryMonitor.x, primaryMonitor.y);
+        this._overlay.set_size(primaryMonitor.width, primaryMonitor.height);
+        this._overlay.hide();
+    }
+
+    /**
+     * Handles the 'session-mode-changed' signal.
+     * Hides the overlay widget if the session mode is 'unlock-dialog', 'lock-screen', 'login', or 'gdm'.
+     */
+    _onSessionModeChanged() {
+        // Get the current session mode
+        let mode = Main.sessionMode.currentMode;
+        // Check if the session mode is one of the specified modes
+        if (mode === 'unlock-dialog' || mode === 'lock-screen' || mode === 'login' || mode === 'gdm') {
+            // If it is, hide the overlay widget
+            if (this._overlay.visible) {
+                this._overlay.hide();
+            }
+        }
     }
 
     /**
@@ -103,6 +133,16 @@ class GameBar extends PanelMenu.Button {
         this._closeButton.destroy();
         // Destroy the soundControls addon
         this._soundControls.destroy();
+
+        if (this._monitorsChangedId) {
+            Main.layoutManager.disconnect(this._monitorsChangedId);
+            this._monitorsChangedId = null;
+        }
+
+        if (this._sessionModeChangedId) {
+            Main.layoutManager.disconnect(this._sessionModeChangedId);
+            this._sessionModeChangedId = null;
+        }
 
         // Call the parent class's destroy method
         super.destroy();
@@ -140,7 +180,7 @@ export default class GameBarExtension extends Extension {
     disable() {
         // If the button exists, destroy it
         if (this._button) {
-            this._button.destroy();
+            this._button?.destroy();
             this._button = null;
         }
 
