@@ -1,10 +1,14 @@
 import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
+import Adw from 'gi://Adw';
 import St from 'gi://St';
+import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import { set_padding_setting } from './utils.js';
 
 // Import addons TODO:: make addons configurable
 import {Clock} from './addons/clock.js';
@@ -50,27 +54,31 @@ class GameBar extends PanelMenu.Button {
     _createOverlay() {
         // Get the primary monitor
         let primaryMonitor = Main.layoutManager.primaryMonitor;
-
+    
         // Create the overlay widget
         this._overlay = new St.Widget({
+            layout_manager: new Clutter.BinLayout(),
             style_class: 'gamebar-overlay', // CSS class for styling
             reactive: true, // Enable reactive handling of events
             can_focus: true, // Enable focus handling
             x_expand: true, // Expand horizontally to fill the width of the parent
             y_expand: true, // Expand vertically to fill the height of the parent
-            visible: false // Start hidden
+            visible: false, // Start hidden
         });
+    
         this._updateOverlayGeometry(Main.layoutManager.primaryMonitor);
+
         // Create instances of addons and pass the overlay widget and the primary monitor
         this._clock = new Clock(this._overlay, primaryMonitor); // Clock addon
         this._closeButton = new CloseButton(this._overlay, primaryMonitor); // Close button addon
         this._soundControls = new SoundControls(this._overlay, primaryMonitor); // Sound controls addon
-
+    
         // Add the overlay widget to the layout manager to affect the input region
         Main.layoutManager.addChrome(this._overlay, { affectsInputRegion: true});
     
         // Connect to 'monitors-changed' signal to update overlay position and size
         this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', () => {
+            //TODO:: fix bug: when change to a diferent resolution monitor, the size wont update properly
             this._updateOverlayGeometry(Main.layoutManager.primaryMonitor);
         });
 
@@ -94,6 +102,7 @@ class GameBar extends PanelMenu.Button {
     _onSessionModeChanged() {
         // Get the current session mode
         let mode = Main.sessionMode.currentMode;
+
         // Check if the session mode is one of the specified modes
         if (mode === 'unlock-dialog' || mode === 'lock-screen' || mode === 'login' || mode === 'gdm') {
             // If it is, hide the overlay widget
@@ -119,6 +128,31 @@ class GameBar extends PanelMenu.Button {
             this._clock._updateClock();
             this._soundControls.updateVolumeControls();
         }
+    }
+
+    /**
+     * Loads the settings
+     */
+    _loadSettings(settings) {
+        // Store the settings object
+        this._settings = settings;
+
+        // Update the settings of the addons with the new settings
+        this._updateSettings(settings);
+    }
+
+    // Called when any settings has changed
+    _onSettingsChanged(settings) {
+        //load the new settings:
+        this._loadSettings(settings);
+    }
+
+    _updateSettings(settings) {
+        //Update addons settings
+        this._clock._updateSettings(settings);
+        this._soundControls._updateSettings(settings);
+        this._closeButton._updateSettings(settings);
+        set_padding_setting(settings.get_int('overlay-padding'))
     }
 
     /**
@@ -155,23 +189,35 @@ export default class GameBarExtension extends Extension {
      * The keybinding allows the user to toggle the visibility of the overlay widget.
      */
     enable() {
+        // Get the extension settings in a variable
+        this._settings = this.getSettings('org.gnome.shell.extensions.gamebar-overlay');
+
         // Create a new instance of the GameBar class
-        this._button = new GameBar();
+        this._gamebar = new GameBar();
 
         // Add the GameBar panel button to the status area
-        Main.panel.addToStatusArea('gamebar', this._button);
+        Main.panel.addToStatusArea(this.uuid, this._gamebar);
+
+        this._settings.bind('show-indicator', this._gamebar, 'visible',
+            Gio.SettingsBindFlags.DEFAULT);
 
         // Add a keybinding to toggle the visibility of the overlay widget
         Main.wm.addKeybinding(
             'toggle-gamebar', // Keybinding name
-            this.getSettings('org.gnome.shell.extensions.gamebar-overlay'), // Settings
+            this._settings, // Settings
             Meta.KeyBindingFlags.NONE, // Flags
             Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW, // Action modes
             () => {
                 // Call the _toggleOverlay method of the GameBar panel button when the keybinding is triggered
-                this._button._toggleOverlay();
+                this._gamebar._toggleOverlay();
             }
         );
+
+        // Connect to setting changes
+        this._settingsChangedId = this._settings.connect('changed', this._gamebar._onSettingsChanged.bind(this._gamebar));
+
+        // Initial load of settings
+        this._gamebar._loadSettings(this._settings);
     }
 
     /**
@@ -179,12 +225,20 @@ export default class GameBarExtension extends Extension {
      */
     disable() {
         // If the button exists, destroy it
-        if (this._button) {
-            this._button?.destroy();
-            this._button = null;
+        if (this._gamebar) {
+            this._gamebar?.destroy();
+            this._gamebar = null;
         }
 
         // Remove the keybinding
         Main.wm.removeKeybinding('toggle-gamebar');
+
+        // Set the extension settings to null
+        if (this._settingsChangedId) {
+            this._settings.disconnect(this._settingsChangedId);
+            this._settingsChangedId = null;
+        }
+
+        this._settings = null;
     }
 }
