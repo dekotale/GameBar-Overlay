@@ -22,12 +22,12 @@ Open the Overlay by clicking the top-bar button or by pressing `Super + G`
 
 - [x] Show actual time
 - [x] Volume control
+- [x] Make configuration of the extension
 - [ ] Screenshot addon
 - [ ] Weather addon
 - [ ] Battery addon
 - [ ] Brightness addon
 - [ ] CPU and GPU usage and temperature addon
-- [ ] Make configuration of the extension
 
 ## Known issues
 
