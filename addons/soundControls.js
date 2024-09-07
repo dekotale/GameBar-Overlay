@@ -20,6 +20,9 @@ export class SoundControls {
         //Listeners:
         this._widthChangeId = null;
         this._heightChangeId = null;
+        this._VolumeSliderNotifyId = null;
+        this._VolumeIconCLickedId = null;
+        this._SliderNotifyId = null;
     }
 
     // Create the main volume controls
@@ -57,14 +60,14 @@ export class SoundControls {
         // Create the volume slider
         this._volumeSlider = new Slider(0);
         this._volumeSlider.set_style('width: 300px;');
-        this._volumeSlider.connect('notify::value', this._onVolumeChanged.bind(this));
+        this._VolumeSliderNotifyId = this._volumeSlider.connect('notify::value', this._onVolumeChanged.bind(this));
 
         // Add the icon and slider to the panel
         volumePanel.add_child(this._volumeIcon);
         volumePanel.add_child(this._volumeSlider);
 
         // Connect the mute toggle to the icon
-        this._volumeIcon.connect('clicked', this._toggleMute.bind(this));
+        this._VolumeIconCLickedId = this._volumeIcon.connect('clicked', this._toggleMute.bind(this));
 
         // Create a box for app-specific volume controls
         this._appVolumesBox = new St.BoxLayout({
@@ -260,7 +263,7 @@ export class SoundControls {
         // Create a volume slider for the app
         let slider = new Slider(stream.volume / this._volumeControl.get_vol_max_norm());
         slider.set_style('width: 300px;'); //TODO:: make configurable
-        slider.connect('notify::value', () => {
+        this._SliderNotifyId = slider.connect('notify::value', () => {
             stream.volume = slider.value * this._volumeControl.get_vol_max_norm();
             stream.push_volume();
         });
@@ -347,13 +350,29 @@ export class SoundControls {
             this._addonContainer.disconnect(this._widthChangeId);
             this._widthChangeId = null;
         }
-      
+
+        if(this._VolumeSliderNotifyId){
+            this._volumeSlider.disconnect(this._VolumeSliderNotifyId)
+            this._VolumeSliderNotifyId = null;
+        }
+        if(this._VolumeIconCLickedId){
+            this._volumeIcon.disconnect(this._VolumeIconCLickedId);
+            this._VolumeIconCLickedId = null;
+        }
+        if(this._SliderNotifyId){
+            this._SliderNotifyId = null;
+        }
+
+        this._volumeSlider?.destroy();
         this._volumeSlider = null;
+        this._volumeIcon?.destroy();
         this._volumeIcon = null;
         this._volumePanel = null;
+        this._appVolumesBox?.destroy();
         this._appVolumesBox = null;
         this._stream = null;
         this._volumeControl = null;
+        this._appVolumesContainer?.destroy();
         this._appVolumesContainer = null;
         this._addonContainer = null;
       }

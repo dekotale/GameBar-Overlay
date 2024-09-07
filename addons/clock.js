@@ -6,9 +6,9 @@ import { getPositionStyle } from '../utils.js';
 export class Clock {
   constructor(overlay, primaryMonitor) {
     this._overlay = overlay;
+    this._primaryMonitor = primaryMonitor;
     this._widthChangeId = null;
     this._heightChangeId = null;
-    this._primaryMonitor = primaryMonitor;
     this._timeLabel = null;
     this._timeoutId = null;
     this._addonContainer = null;
@@ -98,6 +98,7 @@ export class Clock {
       this._timeoutId = null;
     }
 
+
     //Disconnects the signals
     if(this._heightChangeId){
       this._addonContainer.disconnect(this._heightChangeId);
@@ -111,5 +112,11 @@ export class Clock {
 
     // Remove the clock widget from the overlay
     this._overlay.remove_child(this._timeLabel.get_parent());
+
+    //Remove other labels:
+    this._timeLabel?.destroy();
+    this._timeLabel = null;
+    this._addonContainer?.destroy();
+    this._addonContainer = null;
   }
 }

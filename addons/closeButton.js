@@ -82,7 +82,10 @@ export class CloseButton {
         // Remove the close button from the overlay
         this._overlay.remove_child(this._closeButton);
         this._overlay.remove_child(this._addonContainer);
+        this._closeButton?.destroy();
         this._closeButton = null;
+        
+        this._addonContainer?.destroy();
         this._addonContainer = null;
     }
 }

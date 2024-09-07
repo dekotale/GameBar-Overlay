@@ -1,6 +1,6 @@
+//Imports:
 import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
-import Adw from 'gi://Adw';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
@@ -10,7 +10,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import { set_padding_setting } from './utils.js';
 
-// Import addons TODO:: make addons configurable
+//Addon Imports:
 import {Clock} from './addons/clock.js';
 import {CloseButton} from './addons/closeButton.js';
 import {SoundControls} from './addons/soundControls.js';
@@ -161,13 +161,24 @@ class GameBar extends PanelMenu.Button {
      * It destroys the clock addon and calls the parent class's destroy method.
      */
     destroy() {
-        // Destroy the clock addon
-        this._clock.destroy();
-        // Destroy the closeButton addon
-        this._closeButton.destroy();
-        // Destroy the soundControls addon
-        this._soundControls.destroy();
+        // Call the addon destroy:
+        this._clock?.destroy();
+        this._clock = null;
+        this._closeButton?.destroy();
+        this._closeButton = null;
+        this._soundControls?.destroy();
+        this._soundControls = null;
 
+        //Destroy overlay:
+        this._overlay?.destroy();
+        this._overlay = null;
+
+        //Destroy other variables:
+        this._icon?.destroy();
+        this._icon = null;
+        this._settings = null;
+
+        //Destroy the signals:
         if (this._monitorsChangedId) {
             Main.layoutManager.disconnect(this._monitorsChangedId);
             this._monitorsChangedId = null;
