@@ -2,7 +2,7 @@
 
 A fullscreen overlay widget for GNOME that displays useful information, audio controls and more.
 
-> [!CAUTION]
+> [!WARNING]
 > This extension has been developed for GNOME 46, although it is possible to install it on other GNOME versions, please note that you do so at your own risk.
 
 ## Features
@@ -22,12 +22,17 @@ Open the Overlay by clicking the top-bar button or by pressing `Super + G`
 
 - [x] Show actual time
 - [x] Volume control
+- [x] Make configuration of the extension
 - [ ] Screenshot addon
 - [ ] Weather addon
 - [ ] Battery addon
 - [ ] Brightness addon
 - [ ] CPU and GPU usage and temperature addon
-- [ ] Make configuration of the extension
+
+## Known issues
+
+- When change the primary monitor to a diferent resolution monitor, the overlay size do not update properly until GNOME reboots.
+- The width of the clock addon's container slightly changes size when the text displaying the time changes.
 
 ## Contributing
 

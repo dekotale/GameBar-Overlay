@@ -1,8 +1,9 @@
 /*-Overlay related styles-*/
 .gamebar-overlay{
     background-color: rgba(0, 0, 0, 0.8);
+    width: 100%;
+    height: 100%;
 }
-
 /*-Addons styles-*/
 
 /*Clock styles*/
@@ -10,11 +11,12 @@
     font-size: 72px;
     text-align: center;
     color: white;
-    margin-top: 50px;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 15px; 
     padding: 5px 20px;
     font-weight: 500;
+    /**TODO:: Fix The width of the clock addon's container slightly 
+    changes size when the text displaying the time changes.**/
 }
 
 /*Close button styles*/
@@ -22,14 +24,11 @@
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 15px; 
     padding: 5px;
-    margin-top: 50px;
 }
 
 /*Volume styles*/
 .gamebar-volume-container-global{
     height: auto; 
-    margin-top: 50px; 
-    margin-left: 50px; 
     background-color: rgba(255, 255, 255, 0.2); 
     border-radius: 15px; 
     padding: 20px;

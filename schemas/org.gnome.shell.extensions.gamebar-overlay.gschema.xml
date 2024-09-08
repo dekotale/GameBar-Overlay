@@ -1,6 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
   <schema id="org.gnome.shell.extensions.gamebar-overlay" path="/org/gnome/shell/extensions/gamebar-overlay/">
+    <key name="show-indicator" type="b">
+      <default>true</default>
+      <summary>Shows the gamebar-overlay indicator in the top-bar</summary>
+      <description>Shows the GameBar Overlay indicator in the Top-Bar</description>
+    </key>
+
+    <key name="clock-addon-show-seconds" type="b">
+      <default>false</default>
+      <summary>Show seconds in the clock addon</summary>
+      <description>Show seconds in the clock addon</description>
+    </key>
+
+    <key name="clock-addon-font-size" type="i">
+      <default>72</default>
+      <summary>Font size for the clock</summary>
+      <description>Font size for the clock</description>
+    </key>
+
+    <key name="clock-addon-position" type="s">
+      <default>'Top Center'</default>
+      <summary>Position for the clock in the overlay</summary>
+      <description>Set the position for the clock in the overlay</description>
+    </key>
+
+    <key name="sound-icon-type" type="s">
+      <default>'Default'</default>
+      <summary>Icon type</summary>
+      <description>Select the icon type: Default or Symbolic</description>
+    </key>
+
+    <key name="sound-controls-icon-size" type="i">
+      <default>48</default>
+      <summary>Icon size for the sound controls</summary>
+      <description>Icon size at the sound panel</description>
+    </key>
+
+    <key name="sound-controls-show-app-description" type="b">
+      <default>false</default>
+      <summary>Show the description of the output audio stream</summary>
+      <description>Show the description of the output audio stream</description>
+    </key>
+
+    <key name="sound-addon-position" type="s">
+      <default>'Top Left'</default>
+      <summary>Position for the sound panel addon in the overlay</summary>
+      <description>Set the position for the sound panel addon in the overlay</description>
+    </key>
+
+    <key name="overlay-opening-monitor" type="s">
+      <default>'Primary'</default>
+      <summary>Monitor to open the overlay on</summary>
+      <description>Monitor to open the overlay on</description>
+    </key>
+
+    <key name="overlay-empty-area-close" type="b">
+      <default>false</default>
+      <summary>Close the overlay by clicking on an empty area</summary>
+      <description>Close the overlay by clicking on an empty area</description>
+    </key>
+
+    <key name="overlay-padding" type="i">
+      <default>50</default>
+      <summary>Padding around the overlay</summary>
+      <description>Padding around the overlay</description>
+    </key>
+
     <key name="toggle-gamebar" type="as">
       <default><![CDATA[['<Super>g']]]></default>
       <summary>Keyboard shortcut to toggle the GameBar overlay</summary>
