@@ -81,11 +81,6 @@ class GameBar extends PanelMenu.Button {
             //TODO:: fix bug: when change to a diferent resolution monitor, the size wont update properly
             this._updateOverlayGeometry(Main.layoutManager.primaryMonitor);
         });
-
-        // Connect to 'session-mode-changed' signal to update overlay visibility in some situations
-        this._sessionModeChangedId = Main.sessionMode.connect('updated', () => {
-            this._onSessionModeChanged();
-        });
     }
 
     //Update overlay geometry
@@ -93,23 +88,6 @@ class GameBar extends PanelMenu.Button {
         this._overlay.set_position(primaryMonitor.x, primaryMonitor.y);
         this._overlay.set_size(primaryMonitor.width, primaryMonitor.height);
         this._overlay.hide();
-    }
-
-    /**
-     * Handles the 'session-mode-changed' signal.
-     * Hides the overlay widget if the session mode is 'unlock-dialog', 'lock-screen', 'login', or 'gdm'.
-     */
-    _onSessionModeChanged() {
-        // Get the current session mode
-        let mode = Main.sessionMode.currentMode;
-
-        // Check if the session mode is one of the specified modes
-        if (mode === 'unlock-dialog' || mode === 'lock-screen' || mode === 'login' || mode === 'gdm') {
-            // If it is, hide the overlay widget
-            if (this._overlay.visible) {
-                this._overlay.hide();
-            }
-        }
     }
 
     /**
@@ -182,11 +160,6 @@ class GameBar extends PanelMenu.Button {
         if (this._monitorsChangedId) {
             Main.layoutManager.disconnect(this._monitorsChangedId);
             this._monitorsChangedId = null;
-        }
-
-        if (this._sessionModeChangedId) {
-            Main.layoutManager.disconnect(this._sessionModeChangedId);
-            this._sessionModeChangedId = null;
         }
 
         // Call the parent class's destroy method

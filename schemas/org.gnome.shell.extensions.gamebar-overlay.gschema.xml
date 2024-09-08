@@ -44,7 +44,7 @@
     </key>
 
     <key name="sound-addon-position" type="s">
-      <default>'Top Center'</default>
+      <default>'Top Left'</default>
       <summary>Position for the sound panel addon in the overlay</summary>
       <description>Set the position for the sound panel addon in the overlay</description>
     </key>
