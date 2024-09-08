@@ -39,7 +39,15 @@ export class CloseButton {
         // Add the addon to the overlay
         this._overlay.add_child(this._addonContainer);
 
-        //TODO:: make close by clicking in a empty area selectable in configuration
+        // Add an event listener to close the overlay when clicking on an empty space
+        this._overlay.connect('button-release-event', (actor, event) => {
+          if (this._emptyAreaClose) {
+            // Check if the overlay itself was clicked
+            if (actor === this._overlay) {
+                this._overlay.hide();
+            }
+          }
+        });
 
         this._widthChangeId = this._addonContainer.connect('notify::width', () => {
             GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
@@ -63,6 +71,7 @@ export class CloseButton {
 
     _updateSettings(settings) {
         this._position = "Top Right";
+        this._emptyAreaClose = settings.get_boolean('overlay-empty-area-close');
         this.destroy();
         this._createCloseButton();
       }

@@ -44,13 +44,14 @@ export default class Preferences extends ExtensionPreferences {
         appearanceGroup.add(overlayPaddingRow);
         settings.bind('overlay-padding', overlayPaddingRow, 'value', Gio.SettingsBindFlags.DEFAULT);
 
-        /*// Behavior Group
+        // Behavior Group
         const behaviorGroup = new Adw.PreferencesGroup({
             title: _('Behavior'),
-            description: _('Configure the behavior of the overlay --Coming soon--'),
+            description: _('Configure the behavior of the overlay'),
         }); 
         generalPage.add(behaviorGroup);
 
+        /*
         // Overlay Opening Monitor
         const monitorRow = new Adw.ComboRow({
             title: _('Overlay Opening Monitor'),
@@ -64,7 +65,7 @@ export default class Preferences extends ExtensionPreferences {
             const selectedIndex = monitorRow.selected;
             const selectedValue = monitorRow.model.get_string(selectedIndex);
             settings.set_string('overlay-opening-monitor', selectedValue);
-        });
+        });*/
 
         // Close on Empty Area Click
         const emptyAreaCloseRow = new Adw.SwitchRow({
@@ -72,7 +73,7 @@ export default class Preferences extends ExtensionPreferences {
             subtitle: _('Close the overlay by clicking on an empty area'),
         });
         behaviorGroup.add(emptyAreaCloseRow);
-        settings.bind('overlay-empty-area-close', emptyAreaCloseRow, 'active', Gio.SettingsBindFlags.DEFAULT);*/
+        settings.bind('overlay-empty-area-close', emptyAreaCloseRow, 'active', Gio.SettingsBindFlags.DEFAULT);
 
         // TODO:: custom Keyboard Shortcut
         /*const shortcutRow = new Adw.ActionRow({
