@@ -67,6 +67,12 @@
       <description>Padding around the overlay</description>
     </key>
 
+    <key name="overlay-background-color" type="s">
+      <default>'rgba(0,0,0,0.8)'</default>
+      <summary>Overlay background color</summary>
+      <description>Background color of the overlay</description>
+    </key>
+
     <key name="toggle-gamebar" type="as">
       <default><![CDATA[['<Super>g']]]></default>
       <summary>Keyboard shortcut to toggle the GameBar overlay</summary>

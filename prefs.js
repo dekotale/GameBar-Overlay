@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
+import Gdk from 'gi://Gdk';
+
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 export default class Preferences extends ExtensionPreferences {
@@ -43,6 +45,30 @@ export default class Preferences extends ExtensionPreferences {
         });
         appearanceGroup.add(overlayPaddingRow);
         settings.bind('overlay-padding', overlayPaddingRow, 'value', Gio.SettingsBindFlags.DEFAULT);
+
+        //Background color
+
+        const colorButton = new Gtk.ColorButton();
+
+        colorButton.use_alpha = true;
+
+        const color = new Gdk.RGBA();
+        color.parse(settings.get_string('overlay-background-color'));
+        colorButton.set_rgba(color);
+
+        colorButton.connect('color-set', () => {
+            const newColor = colorButton.get_rgba().to_string();
+            settings.set_string('overlay-background-color', newColor);
+        });
+
+        const overlayBackgroundColorRow = new Adw.ActionRow({
+            title: 'Overlay background color',
+            activatable_widget: colorButton
+        });
+
+
+        overlayBackgroundColorRow.add_suffix(colorButton);
+        appearanceGroup.add(overlayBackgroundColorRow);
 
         // Behavior Group
         const behaviorGroup = new Adw.PreferencesGroup({

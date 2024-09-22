@@ -65,6 +65,7 @@ class GameBar extends PanelMenu.Button {
             y_expand: true, // Expand vertically to fill the height of the parent
             visible: false, // Start hidden
         });
+
     
         this._updateOverlayGeometry(Main.layoutManager.primaryMonitor);
 
@@ -131,6 +132,13 @@ class GameBar extends PanelMenu.Button {
         this._soundControls._updateSettings(settings);
         this._closeButton._updateSettings(settings);
         set_padding_setting(settings.get_int('overlay-padding'))
+
+        //Update overlay settings
+
+        //Overlay config styles
+        const backgroundColor = settings.get_string('overlay-background-color');
+        this._overlay.style = `background-color: ${backgroundColor}`
+
     }
 
     /**
@@ -221,6 +229,10 @@ export default class GameBarExtension extends Extension {
         if (this._settingsChangedId) {
             this._settings.disconnect(this._settingsChangedId);
             this._settingsChangedId = null;
+        }
+
+        if (this._settings){
+            this._settings.disconnect('changed::overlay-background-color');
         }
 
         this._settings = null;
