@@ -78,5 +78,17 @@
       <summary>Keyboard shortcut to toggle the GameBar overlay</summary>
       <description>Keyboard shortcut to show/hide the GameBar overlay</description>
     </key>
+
+    <key name="toggle-gamebar-1" type="s">
+      <default>'Super'</default>
+      <summary>Key</summary>
+      <description>key</description>
+    </key>
+
+    <key name="toggle-gamebar-2" type="s">
+      <default>'g'</default>
+      <summary>Key</summary>
+      <description>key</description>
+    </key>
   </schema>
 </schemalist>

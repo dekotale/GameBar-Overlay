@@ -131,6 +131,7 @@ class GameBar extends PanelMenu.Button {
         this._clock._updateSettings(settings);
         this._soundControls._updateSettings(settings);
         this._closeButton._updateSettings(settings);
+        this._temperatureMonitor._updateSettings(settings);
         set_padding_setting(settings.get_int('overlay-padding'))
 
         //Update overlay settings
@@ -194,16 +195,12 @@ export default class GameBarExtension extends Extension {
             Gio.SettingsBindFlags.DEFAULT);
 
         // Add a keybinding to toggle the visibility of the overlay widget
-        Main.wm.addKeybinding(
-            'toggle-gamebar', // Keybinding name
-            this._settings, // Settings
-            Meta.KeyBindingFlags.NONE, // Flags
-            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW, // Action modes
-            () => {
-                // Call the _toggleOverlay method of the GameBar panel button when the keybinding is triggered
-                this._gamebar._toggleOverlay();
-            }
-        );
+        this._addKeybinding();
+
+        this._keybindId = this._settings.connect('changed::toggle-gamebar', () => {
+            Main.wm.removeKeybinding('toggle-gamebar');
+            this._addKeybinding();
+        });
 
         // Connect to setting changes
         this._settingsChangedId = this._settings.connect('changed', this._gamebar._onSettingsChanged.bind(this._gamebar));
@@ -211,6 +208,18 @@ export default class GameBarExtension extends Extension {
         // Initial load of settings
         this._gamebar._loadSettings(this._settings);
     }
+
+    _addKeybinding() {
+        Main.wm.addKeybinding(
+            'toggle-gamebar',
+            this._settings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            () => {
+                this._gamebar._toggleOverlay();
+            }
+        );
+    }    
 
     /**
      * Disables the extension by removing the keybinding and destroying the status area button.
@@ -226,6 +235,11 @@ export default class GameBarExtension extends Extension {
         Main.wm.removeKeybinding('toggle-gamebar');
 
         // Set the extension settings to null
+        if (this._keybindId) {
+            Main.layoutManager.disconnect(this._keybindId);
+            this._keybindId = null;
+        }
+
         if (this._settingsChangedId) {
             this._settings.disconnect(this._settingsChangedId);
             this._settingsChangedId = null;
