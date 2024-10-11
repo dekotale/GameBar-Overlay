@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
 import Gdk from 'gi://Gdk';
+import GLib from 'gi://GLib';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
@@ -101,12 +102,74 @@ export default class Preferences extends ExtensionPreferences {
         behaviorGroup.add(emptyAreaCloseRow);
         settings.bind('overlay-empty-area-close', emptyAreaCloseRow, 'active', Gio.SettingsBindFlags.DEFAULT);
 
-        // TODO:: custom Keyboard Shortcut
-        /*const shortcutRow = new Adw.ActionRow({
-            title: _('Toggle GameBar Shortcut'),
-            subtitle: _('Keyboard shortcut to show/hide the GameBar overlay'),
+        //Keybinding group
+
+        const keyBindingGroup = new Adw.PreferencesGroup({
+            title: _('Keybinding'),
+            description: _('Configure the keybinding of the overlay'),
+        }); 
+        generalPage.add(keyBindingGroup);
+
+        //Custom Keyboard keybinding
+        const shortcutComboValues = [
+            'Super',
+            'Shift',
+            'Control',
+            'Alt'
+        ];
+        
+        const shortcutCombo = new Adw.ComboRow({
+            title: _('First key'),
+            model: new Gtk.StringList({strings: shortcutComboValues}),
         });
-        behaviorGroup.add(shortcutRow);*/
+
+        shortcutCombo.set_selected(shortcutComboValues.indexOf(settings.get_string("toggle-gamebar-1")));
+        
+        keyBindingGroup.add(shortcutCombo);
+        settings.bind('toggle-gamebar-1', shortcutCombo, 'selected', Gio.SettingsBindFlags.DEFAULT);
+
+        shortcutCombo.connect('notify::selected', () => {
+            const selectedIndex = shortcutCombo.selected;
+            const selectedValue = shortcutCombo.model.get_string(selectedIndex);
+            settings.set_string('toggle-gamebar-1', selectedValue);
+            updateToggleGameBar();
+        });
+
+        const shortkeysValues = [
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 
+            'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+            'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
+            'Escape', 'Tab', 'CapsLock', 'Space', 
+            'Enter', 'Backspace', 'Delete', 'Insert', 'Home', 'End', 'PageUp', 'PageDown',
+            'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Pause', 'ScrollLock'
+        ];
+
+        const shortkeys = new Adw.ComboRow({
+            title: _('Last key'),
+            model: new Gtk.StringList({strings: shortkeysValues}),
+        });
+
+        shortkeys.set_selected(shortkeysValues.indexOf(settings.get_string("toggle-gamebar-2")));
+        keyBindingGroup.add(shortkeys);
+        settings.bind('toggle-gamebar-2', shortkeys, 'selected', Gio.SettingsBindFlags.DEFAULT);
+
+        shortkeys.connect('notify::selected', () => {
+            const selectedIndex = shortkeys.selected;
+            const selectedValue = shortkeys.model.get_string(selectedIndex);
+            settings.set_string('toggle-gamebar-2', selectedValue);
+            updateToggleGameBar();
+        });
+
+
+        function updateToggleGameBar() {
+            const key1 = settings.get_string('toggle-gamebar-1');
+            const key2 = settings.get_string('toggle-gamebar-2');
+        
+            const newShortcut = [`<${key1}>${key2}`];
+            
+            settings.set_value('toggle-gamebar', new GLib.Variant('as', newShortcut));
+        }        
  
         // Clock Addon Page
         const clockPage = new Adw.PreferencesPage({
