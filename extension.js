@@ -18,7 +18,6 @@ import {SoundControls} from './addons/soundControls.js';
 //TODO:: weather addon
 //TODO:: battery addon
 //TODO:: brightness addon
-//TODO:: cpu and gpu usage and temperature addon
 
 const GameBar = GObject.registerClass(
 class GameBar extends PanelMenu.Button {
@@ -54,7 +53,7 @@ class GameBar extends PanelMenu.Button {
     _createOverlay() {
         // Get the primary monitor
         let primaryMonitor = Main.layoutManager.primaryMonitor;
-    
+
         // Create the overlay widget
         this._overlay = new St.Widget({
             layout_manager: new Clutter.BinLayout(),
@@ -89,6 +88,7 @@ class GameBar extends PanelMenu.Button {
         this._overlay.set_position(primaryMonitor.x, primaryMonitor.y);
         this._overlay.set_size(primaryMonitor.width, primaryMonitor.height);
         this._overlay.hide();
+
     }
 
     /**
@@ -131,12 +131,11 @@ class GameBar extends PanelMenu.Button {
         this._clock._updateSettings(settings);
         this._soundControls._updateSettings(settings);
         this._closeButton._updateSettings(settings);
-        this._temperatureMonitor._updateSettings(settings);
         set_padding_setting(settings.get_int('overlay-padding'))
 
         //Update overlay settings
 
-        //Overlay config styles
+        // TODO:: Overlay config styles
         const backgroundColor = settings.get_string('overlay-background-color');
         this._overlay.style = `background-color: ${backgroundColor}`
 
@@ -219,7 +218,7 @@ export default class GameBarExtension extends Extension {
                 this._gamebar._toggleOverlay();
             }
         );
-    }    
+    }
 
     /**
      * Disables the extension by removing the keybinding and destroying the status area button.

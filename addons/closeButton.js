@@ -55,7 +55,7 @@ export class CloseButton {
               return GLib.SOURCE_REMOVE;
             });
           });
-        
+
           this._heightChangeId = this._addonContainer.connect('notify::height', () => {
             GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
               this.set_addon_position();
@@ -82,7 +82,7 @@ export class CloseButton {
             this._addonContainer.disconnect(this._heightChangeId);
             this._heightChangeId = null;
         }
-    
+
         if(this._widthChangeId){
             this._addonContainer.disconnect(this._widthChangeId);
             this._widthChangeId = null;
@@ -93,7 +93,7 @@ export class CloseButton {
         this._overlay.remove_child(this._addonContainer);
         this._closeButton?.destroy();
         this._closeButton = null;
-        
+
         this._addonContainer?.destroy();
         this._addonContainer = null;
     }

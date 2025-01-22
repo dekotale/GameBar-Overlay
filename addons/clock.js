@@ -26,7 +26,7 @@ export class Clock {
     // Set the left margin of the label to center it horizontally on the primary monitor
     this._timeLabel.set_style(`
       font-size: ${this._clockFontSize}px;
-  `);
+    `);
 
     // Create a box layout to hold the label and position it
     this._addonContainer = new St.Widget({
@@ -45,7 +45,7 @@ export class Clock {
         return GLib.SOURCE_REMOVE;
       });
     });
-  
+
     this._heightChangeId = this._addonContainer.connect('notify::height', () => {
       GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
         this.set_addon_position();
