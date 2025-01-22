@@ -18,7 +18,6 @@ import {SoundControls} from './addons/soundControls.js';
 //TODO:: weather addon
 //TODO:: battery addon
 //TODO:: brightness addon
-//TODO:: cpu and gpu usage and temperature addon
 
 const GameBar = GObject.registerClass(
 class GameBar extends PanelMenu.Button {
@@ -54,7 +53,7 @@ class GameBar extends PanelMenu.Button {
     _createOverlay() {
         // Get the primary monitor
         let primaryMonitor = Main.layoutManager.primaryMonitor;
-    
+
         // Create the overlay widget
         this._overlay = new St.Widget({
             layout_manager: new Clutter.BinLayout(),
@@ -66,17 +65,17 @@ class GameBar extends PanelMenu.Button {
             visible: false, // Start hidden
         });
 
-    
+
         this._updateOverlayGeometry(Main.layoutManager.primaryMonitor);
 
         // Create instances of addons and pass the overlay widget and the primary monitor
         this._clock = new Clock(this._overlay, primaryMonitor); // Clock addon
         this._closeButton = new CloseButton(this._overlay, primaryMonitor); // Close button addon
         this._soundControls = new SoundControls(this._overlay, primaryMonitor); // Sound controls addon
-    
-        // Add the overlay widget to the layout manager to affect the input region
-        Main.layoutManager.addChrome(this._overlay, { affectsInputRegion: true});
-    
+
+        // Add the overlay widget to the global stage to affect the input region.
+        global.stage.add_child(this._overlay);
+
         // Connect to 'monitors-changed' signal to update overlay position and size
         this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', () => {
             //TODO:: fix bug: when change to a diferent resolution monitor, the size wont update properly
@@ -89,6 +88,7 @@ class GameBar extends PanelMenu.Button {
         this._overlay.set_position(primaryMonitor.x, primaryMonitor.y);
         this._overlay.set_size(primaryMonitor.width, primaryMonitor.height);
         this._overlay.hide();
+
     }
 
     /**
@@ -131,12 +131,11 @@ class GameBar extends PanelMenu.Button {
         this._clock._updateSettings(settings);
         this._soundControls._updateSettings(settings);
         this._closeButton._updateSettings(settings);
-        this._temperatureMonitor._updateSettings(settings);
         set_padding_setting(settings.get_int('overlay-padding'))
 
         //Update overlay settings
 
-        //Overlay config styles
+        // TODO:: Overlay config styles
         const backgroundColor = settings.get_string('overlay-background-color');
         this._overlay.style = `background-color: ${backgroundColor}`
 
@@ -219,7 +218,7 @@ export default class GameBarExtension extends Extension {
                 this._gamebar._toggleOverlay();
             }
         );
-    }    
+    }
 
     /**
      * Disables the extension by removing the keybinding and destroying the status area button.
