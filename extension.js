@@ -66,17 +66,17 @@ class GameBar extends PanelMenu.Button {
             visible: false, // Start hidden
         });
 
-    
+
         this._updateOverlayGeometry(Main.layoutManager.primaryMonitor);
 
         // Create instances of addons and pass the overlay widget and the primary monitor
         this._clock = new Clock(this._overlay, primaryMonitor); // Clock addon
         this._closeButton = new CloseButton(this._overlay, primaryMonitor); // Close button addon
         this._soundControls = new SoundControls(this._overlay, primaryMonitor); // Sound controls addon
-    
-        // Add the overlay widget to the layout manager to affect the input region
-        Main.layoutManager.addChrome(this._overlay, { affectsInputRegion: true});
-    
+
+        // Add the overlay widget to the global stage to affect the input region.
+        global.stage.add_child(this._overlay);
+
         // Connect to 'monitors-changed' signal to update overlay position and size
         this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', () => {
             //TODO:: fix bug: when change to a diferent resolution monitor, the size wont update properly
