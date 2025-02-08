@@ -14,6 +14,7 @@ import { set_padding_setting } from './utils.js';
 import {Clock} from './addons/clock.js';
 import {CloseButton} from './addons/closeButton.js';
 import {SoundControls} from './addons/soundControls.js';
+import {CPU} from './addons/cpu.js';
 //TODO:: screenshot addon
 //TODO:: weather addon
 //TODO:: battery addon
@@ -72,6 +73,7 @@ class GameBar extends PanelMenu.Button {
         this._clock = new Clock(this._overlay, primaryMonitor); // Clock addon
         this._closeButton = new CloseButton(this._overlay, primaryMonitor); // Close button addon
         this._soundControls = new SoundControls(this._overlay, primaryMonitor); // Sound controls addon
+        this._cpu = new CPU(this._overlay, primaryMonitor); // CPU stats addon
 
         // Add the overlay widget to the global stage to affect the input region.
         global.stage.add_child(this._overlay);
@@ -131,6 +133,7 @@ class GameBar extends PanelMenu.Button {
         this._clock._updateSettings(settings);
         this._soundControls._updateSettings(settings);
         this._closeButton._updateSettings(settings);
+        this._cpu._updateSettings(settings);
         set_padding_setting(settings.get_int('overlay-padding'))
 
         //Update overlay settings
@@ -154,6 +157,8 @@ class GameBar extends PanelMenu.Button {
         this._closeButton = null;
         this._soundControls?.destroy();
         this._soundControls = null;
+        this._cpu?.destroy();
+        this._cpu = null;
 
         //Destroy overlay:
         this._overlay?.destroy();

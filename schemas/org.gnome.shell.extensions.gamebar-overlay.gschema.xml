@@ -25,6 +25,12 @@
       <description>Set the position for the clock in the overlay</description>
     </key>
 
+    <key name="cpu-addon-position" type="s">
+      <default>'Bottom Left'</default>
+      <summary>Position for the CPU stats in the overlay</summary>
+      <description>Set the position for the CPU stats in the overlay</description>
+    </key>
+
     <key name="sound-icon-type" type="s">
       <default>'Default'</default>
       <summary>Icon type</summary>
