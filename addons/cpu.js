@@ -206,44 +206,57 @@ export class CPU {
     this._createCPUWidget();
   }
 
-  destroy() {
-    // Stop the clock updates
+destroy() {
+    // Stop the monitor
     this._stopMonitor();
 
-    // Disconnect all signals
-    if (this._heightChangeId) {
+    // Disconnect signals
+    if (this._heightChangeId > 0) {
       this._addonContainer.disconnect(this._heightChangeId);
       this._heightChangeId = null;
     }
 
-    if (this._widthChangeId) {
+    if (this._widthChangeId > 0) {
       this._addonContainer.disconnect(this._widthChangeId);
       this._widthChangeId = null;
     }
 
-    if (this._visibilityChangedId) {
+    if (this._visibilityChangedId > 0) {
       this._overlay.disconnect(this._visibilityChangedId);
       this._visibilityChangedId = null;
     }
 
-    // Remove the clock widget from the overlay
-    if (this._cpuContainer && this._cpuContainer.get_parent()) {
-      this._overlay.remove_child(this._cpuContainer.get_parent());
+    // Destroy childrens and remove them from their parent
+    if (this._cpuUsageLabel) {
+        this._cpuContainer.remove_child(this._cpuUsageLabel);
+        this._cpuUsageLabel.destroy();
+        this._cpuUsageLabel = null;
+    }
+    if (this._cpuLabel) {
+        this._cpuContainer.remove_child(this._cpuLabel);
+        this._cpuLabel.destroy();
+        this._cpuLabel = null;
+    }
+    if (this._tempLabel) {
+        this._cpuContainer.remove_child(this._tempLabel);
+        this._tempLabel.destroy();
+        this._tempLabel = null;
+    }
+    if (this._cpuContainer) {
+      this._addonContainer.remove_child(this._cpuContainer)
+      this._cpuContainer.destroy();
+      this._cpuContainer = null
     }
 
-    // Cleanup
-    this._cpuContainer?.destroy();
-    this._cpuContainer = null;
-    this._cpuUsageLabel?.destroy();
-    this._cpuUsageLabel = null;
-    this._cpuLabel?.destroy();
-    this._cpuLabel = null;
-    this._tempContainer?.destroy();
-    this._tempContainer = null;
-    this._tempLabel?.destroy()
-    this._tempLabel = null;
-    this._addonContainer?.destroy();
-    this._addonContainer = null;
+    // Destroy the addon container and remove it from the overlay.
+    if (this._addonContainer && this._addonContainer.get_parent()) {
+      this._overlay.remove_child(this._addonContainer);
+      this._addonContainer.destroy();
+      this._addonContainer = null;
+    }
+
+
+    // Cleanup properties
     this._prevCpu = null;
     this._hwmonPath = null;
   }
