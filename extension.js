@@ -101,8 +101,10 @@ class GameBar extends PanelMenu.Button {
         if (this._overlay.visible) {
             // If visible, hide the overlay
             this._overlay.hide();
+            Meta.enable_unredirect_for_display(global.display);
         } else {
             // If not visible, show the overlay and update the clock and volume controls
+            Meta.disable_unredirect_for_display(global.display);
             this._overlay.show();
             this._clock._updateClock();
             this._soundControls.updateVolumeControls();
