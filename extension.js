@@ -101,10 +101,27 @@ class GameBar extends PanelMenu.Button {
         if (this._overlay.visible) {
             // If visible, hide the overlay
             this._overlay.hide();
-            Meta.enable_unredirect_for_display(global.display);
+
+            // Enable unredirect back when the overlay is closed.
+            try {
+                // Enable unredirect for GNOME 47 and below.
+                Meta.enable_unredirect_for_display(global.display);
+            } catch (exception) {
+                // Enable unredirect for GNOME 48 and above.
+                global.compositor.enable_unredirect();
+            }
+            
         } else {
+            // Disable unredirect before showing the overlay to prevent fullscreen windows from obstructing the overlay.
+            try {
+                // Disable unredirect for GNOME 47 and below.
+                Meta.disable_unredirect_for_display(global.display);
+            } catch (exception) {
+                // Enable unredirect for GNOME 48 and above.
+                global.compositor.disable_unredirect();
+            }
+
             // If not visible, show the overlay and update the clock and volume controls
-            Meta.disable_unredirect_for_display(global.display);
             this._overlay.show();
             this._clock._updateClock();
             this._soundControls.updateVolumeControls();
