@@ -7,6 +7,7 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import { set_padding_setting } from './utils.js';
 
@@ -18,6 +19,11 @@ import {SoundControls} from './addons/soundControls.js';
 //TODO:: weather addon
 //TODO:: battery addon
 //TODO:: brightness addon
+
+function isGnome48OrNewer() {
+    let version = Config.PACKAGE_VERSION.split('.').map(Number);
+    return version[0] >= 48;
+}
 
 const GameBar = GObject.registerClass(
 class GameBar extends PanelMenu.Button {
@@ -103,22 +109,22 @@ class GameBar extends PanelMenu.Button {
             this._overlay.hide();
 
             // Enable unredirect back when the overlay is closed.
-            try {
-                // Enable unredirect for GNOME 47 and below.
-                Meta.enable_unredirect_for_display(global.display);
-            } catch (exception) {
+            if (isGnome48OrNewer()){
                 // Enable unredirect for GNOME 48 and above.
                 global.compositor.enable_unredirect();
+            }else{
+                // Enable unredirect for GNOME 47 and below.
+                Meta.enable_unredirect_for_display(global.display);
             }
-            
+
         } else {
             // Disable unredirect before showing the overlay to prevent fullscreen windows from obstructing the overlay.
-            try {
-                // Disable unredirect for GNOME 47 and below.
-                Meta.disable_unredirect_for_display(global.display);
-            } catch (exception) {
+            if (isGnome48OrNewer()){
                 // Enable unredirect for GNOME 48 and above.
                 global.compositor.disable_unredirect();
+            }else{
+                // Disable unredirect for GNOME 47 and below.
+                Meta.disable_unredirect_for_display(global.display);
             }
 
             // If not visible, show the overlay and update the clock and volume controls
