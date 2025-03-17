@@ -3,7 +3,7 @@
 A fullscreen overlay widget for GNOME that displays useful information, audio controls and more.
 
 > [!WARNING]
-> This extension has been developed for GNOME 46 and 47, although it is possible to install it on other GNOME versions, please note that you do so at your own risk.
+> This extension has been developed for GNOME 46, 47 and 48, although it is possible to install it on other GNOME versions, please note that you do so at your own risk.
 
 ## Features
 
