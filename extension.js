@@ -105,6 +105,8 @@ class GameBar extends PanelMenu.Button {
     _toggleOverlay() {
         // Check if the overlay is visible
         if (this._overlay.visible) {
+            // Unset key focus
+            global.stage.set_key_focus(null);
             // If visible, hide the overlay
             this._overlay.hide();
 
@@ -131,6 +133,9 @@ class GameBar extends PanelMenu.Button {
             this._overlay.show();
             this._clock._updateClock();
             this._soundControls.updateVolumeControls();
+
+            // Grab key focus
+            global.stage.set_key_focus(this._overlay);
         }
     }
 
