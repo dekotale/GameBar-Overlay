@@ -350,5 +350,22 @@ export default class Preferences extends ExtensionPreferences {
             const selectedValue = cpuAddonPosition.model.get_string(selectedIndex);
             settings.set_string('cpu-addon-position', selectedValue);
         });
+
+        // Temperature Unit
+        const temperatureUnitValues = ['C', 'F'];
+        const temperatureUnitRow = new Adw.ComboRow({
+            title: _('Temperature Unit'),
+            subtitle: _('Select the temperature unit (Celsius or Fahrenheit)'),
+            model: new Gtk.StringList({ strings: temperatureUnitValues }),
+        });
+        temperatureUnitRow.set_selected(temperatureUnitValues.indexOf(settings.get_string('cpu-temperature-unit')));
+        cpuGroup.add(temperatureUnitRow);
+        settings.bind('cpu-temperature-unit', temperatureUnitRow, 'selected', Gio.SettingsBindFlags.DEFAULT);
+
+        temperatureUnitRow.connect('notify::selected', () => {
+            const selectedIndex = temperatureUnitRow.selected;
+            const selectedValue = temperatureUnitRow.model.get_string(selectedIndex);
+            settings.set_string('cpu-temperature-unit', selectedValue);
+        });
     }
 }

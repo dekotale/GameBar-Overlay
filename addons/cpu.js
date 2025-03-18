@@ -1,97 +1,107 @@
 import St from 'gi://St';
 import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
-import GTop from 'gi://GTop';
-import Gio from 'gi://Gio';
-import { getPositionStyle } from '../utils.js';
+import { getPositionStyle, readFile, listDir, findHwmon, celsiusToFahrenheit } from '../utils.js';
+
+// Import GTop conditionally
+let GTop = null;
+try {
+    GTop = await import('gi://GTop');
+} catch (e) {
+    // GTop is not available, it is already null
+}
 
 export class CPU {
-  constructor(overlay, primaryMonitor) {
-    this._overlay = overlay;
-    this._primaryMonitor = primaryMonitor;
-    this._widthChangeId = null;
-    this._heightChangeId = null;
-    this._cpuContainer = null;
-    this._cpuUsageLabel = null;
-    this._cpuLabel = null;
-    this._tempContainer = null;
-    this._tempLabel = null;
-    this._timeoutId = null;
-    this._addonContainer = null;
-    this._visibilityChangedId = null;
-    this._hwmonPath = null;
-    this._prevCpu = null;
-    this._createCPUWidget();
-  }
-
-  _createCPUWidget() {
-    this._prevCpu = new GTop.glibtop_cpu();
-    this._findHwmon();
-  
-    this._addonContainer = new St.Widget({
-      layout_manager: new Clutter.BinLayout()  
-    });
-  
-    // Create a container for CPU stats
-    this._cpuContainer = new St.BoxLayout({
-      vertical: true,
-      style_class: 'gamebar-cpu-container'
-    });
-  
-    // Create the CPU title label
-    this._cpuLabel = new St.Label({
-        style_class: 'gamebar-cpu-label',
-        text: 'CPU'
-    });
-  
-    // Create CPU usage label
-    this._cpuUsageLabel = new St.Label({
-        style_class: 'gamebar-cpu-usage',
-    });
-  
-    // Create CPU temperature label
-    this._tempLabel = new St.Label({
-        style_class: 'gamebar-cpu-temp'
-    });
-  
-    this._cpuContainer.add_child(this._cpuLabel);
-    this._cpuContainer.add_child(this._cpuUsageLabel);
-    this._cpuContainer.add_child(this._tempLabel);
-  
-    this._addonContainer.add_child(this._cpuContainer);
-  
-    // Add the addon container to the overlay
-    this._overlay.add_child(this._addonContainer);
-  
-    //Add the listeners for change width and height:
-    this._widthChangeId = this._addonContainer.connect('notify::width', () => {
-      GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-        this.set_addon_position();
-        return GLib.SOURCE_REMOVE;
-      });
-    });
-  
-    this._heightChangeId = this._addonContainer.connect('notify::height', () => {
-      GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-        this.set_addon_position();
-        return GLib.SOURCE_REMOVE;
-      });
-    });
-  
-    // Connect to overlay visibility changes
-    this._visibilityChangedId = this._overlay.connect('notify::visible', () => {
-      if (this._overlay.visible) {
-        this._startMonitor();
-      } else {
-        this._stopMonitor();
-      }
-    });
-  
-    // Initial update if overlay is visible
-    if (this._overlay.visible) {
-      this._startMonitor();
+    constructor(overlay, primaryMonitor) {
+        this._overlay = overlay;
+        this._primaryMonitor = primaryMonitor;
+        this._widthChangeId = null;
+        this._heightChangeId = null;
+        this._cpuContainer = null;
+        this._cpuUsageLabel = null;
+        this._cpuLabel = null;
+        this._tempContainer = null;
+        this._tempLabel = null;
+        this._timeoutId = null;
+        this._addonContainer = null;
+        this._visibilityChangedId = null;
+        this._hwmonPath = null;
+        this._prevCpu = null;
+        this._gtopAvailable = GTop !== null;
+        this._tempUnit = 'C'; // Default to Celsius
+        this._createCPUWidget();
     }
-  }  
+
+    _createCPUWidget() {
+        if (this._gtopAvailable) {
+            this._prevCpu = new GTop.default.glibtop_cpu();
+        }
+        this._hwmonPath = findHwmon();
+
+        this._addonContainer = new St.Widget({
+            layout_manager: new Clutter.BinLayout()
+        });
+
+        // Create a container for CPU stats
+        this._cpuContainer = new St.BoxLayout({
+            vertical: true,
+            style_class: 'gamebar-cpu-container'
+        });
+
+        // Create the CPU title label
+        this._cpuLabel = new St.Label({
+            style_class: 'gamebar-cpu-label',
+            text: 'CPU'
+        });
+
+        // Create CPU usage label
+        this._cpuUsageLabel = new St.Label({
+            style_class: 'gamebar-cpu-usage',
+        });
+
+        // Create CPU temperature label (or GTop missing message)
+        this._tempLabel = new St.Label({
+            style_class: 'gamebar-cpu-temp'
+        });
+
+        this._cpuContainer.add_child(this._cpuLabel);
+        this._cpuContainer.add_child(this._cpuUsageLabel);
+        this._cpuContainer.add_child(this._tempLabel);
+
+        this._addonContainer.add_child(this._cpuContainer);
+
+        // Add the addon container to the overlay
+        this._overlay.add_child(this._addonContainer);
+
+        //Add the listeners for change width and height:
+        this._widthChangeId = this._addonContainer.connect('notify::width', () => {
+            GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                this.set_addon_position();
+                return GLib.SOURCE_REMOVE;
+            });
+        });
+
+        this._heightChangeId = this._addonContainer.connect('notify::height', () => {
+            GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                this.set_addon_position();
+                return GLib.SOURCE_REMOVE;
+            });
+        });
+
+        // Connect to overlay visibility changes
+        this._visibilityChangedId = this._overlay.connect('notify::visible', () => {
+            if (this._overlay.visible) {
+                this._startMonitor();
+            } else {
+                this._stopMonitor();
+            }
+        });
+
+        // Initial update if overlay is visible
+        if (this._overlay.visible) {
+            this._startMonitor();
+        }
+    }
 
   _startMonitor() {
     // Initial update
@@ -119,9 +129,12 @@ export class CPU {
     this._addonContainer.set_position(position_style.x, position_style.y);
   }
 
-  _getCpuUsage() {
-    const cpu = new GTop.glibtop_cpu();
-    GTop.glibtop_get_cpu(cpu);
+    _getCpuUsage() {
+        if (!this._gtopAvailable){
+            return '-';
+        }
+        const cpu = new GTop.default.glibtop_cpu();
+        GTop.default.glibtop_get_cpu(cpu);
 
     const total = cpu.total - this._prevCpu.total;
     const user = cpu.user - this._prevCpu.user;
@@ -133,56 +146,28 @@ export class CPU {
     return Math.round((user + sys + nice) / Math.max(total, 1.0) * 100);
   }
 
-  // TODO: move to utils
-  _readFile(path) {
-    const file = Gio.File.new_for_path(path);
-    const [success, contents] = file.load_contents(null); // "success" is required for this function to work, probably needs some error handling here
+    _getCpuTemperature() {
+        if (!this._hwmonPath) {
+        return { temp: "N/A", unit: "" };
+        }
+    const temperature = readFile(this._hwmonPath);
+    if (temperature === null) {
+        return { temp: "Error", unit: "" };
+        }
 
-    const decoder = new TextDecoder('utf-8');
-    return decoder.decode(contents);
-  }
+    let celsius = Math.round(parseInt(temperature) / 1000);
+    let tempValue;
+    let unitSymbol;
 
-  // TODO: move to utils
-  _listDir(path) {
-    const dir = Gio.File.new_for_path(path);
-    const enumerator = dir.enumerate_children('standard::*', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
-    
-    let files = [];
-    let fileInfo;
-    
-    while ((fileInfo = enumerator.next_file(null)) !== null) {
-        files.push(fileInfo);
+    if (this._tempUnit === 'C') {
+        tempValue = celsius;
+        unitSymbol = "°C";
+    } else { // Fahrenheit
+        tempValue = Math.round(celsiusToFahrenheit(celsius));
+        unitSymbol = "°F";
     }
-    
-    return files;
-  }
-
-  // TODO: move to utils for future sensors
-  // TODO: handle whatever errors may appear, or when hwmon is missing.
-  _findHwmon() {
-    // Known CPU hwmon drivers
-    const drivers = ['zenpower', 'k10temp']; 
-    
-    // Find the correct hwmon driver
-    let hwmonDirs = this._listDir("/sys/class/hwmon/");
-    for (let i = 0; i < hwmonDirs.length; i++) {
-        let hwmonDir = hwmonDirs[i];
-        let hwmonBasePath = "/sys/class/hwmon/" + hwmonDir.get_name();
-        let driverName = this._readFile(hwmonBasePath + "/name").trim();
-
-        if (drivers.includes(driverName)) {
-          this._hwmonPath = hwmonBasePath + '/temp1_input';
-      }
+    return { temp: tempValue, unit: unitSymbol};
     }
-  }
-
-  _getCpuTemperature() {
-    const temperature = this._readFile(this._hwmonPath);
-
-    // Convert from millidegrees Celsius to Celsius
-    // TODO: implement Fahrenheit?
-    return Math.round(temperature / 1000);
-  }
 
   _updateMonitor() {
     // Only update if the overlay is visible
@@ -190,15 +175,26 @@ export class CPU {
       return false;
     }
 
-    // Update the clock widget with the new time
-    this._cpuUsageLabel.set_text(this._getCpuUsage() + "%");
-    this._tempLabel.set_text(this._getCpuTemperature() + "°C");
+        // Update the clock widget with the new time
+        this._cpuUsageLabel.set_text(this._getCpuUsage() + "%");
+    const temp = this._getCpuTemperature();
+
+        if (this._gtopAvailable && this._hwmonPath) {
+        this._tempLabel.set_text(temp.temp + temp.unit);
+        } else if (!this._gtopAvailable) {
+            this._tempLabel.set_text("GTop missing, install 'libgtop' for temperature");
+            this._cpuUsageLabel.set_text(""); //Dont show anything here when GTop is not available
+        }
+        else if (!this._hwmonPath) {
+            this._tempLabel.set_text("Temperature sensor not found");
+        }
 
     return true;
   }
 
-  _updateSettings(settings) {
-    this._position = settings.get_string('cpu-addon-position');
+    _updateSettings(settings) {
+        this._position = settings.get_string('cpu-addon-position');
+    this._tempUnit = settings.get_string('cpu-temperature-unit'); // Get unit from settings
 
     // Recreate the widget with new settings
     this._stopMonitor();
