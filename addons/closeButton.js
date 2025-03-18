@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import { getPositionStyle } from '../utils.js';
 
 export class CloseButton {
-    constructor(overlay, primaryMonitor) {
+    constructor(overlay, primaryMonitor, toggleOverlay) {
         this._overlay = overlay;
         this._primaryMonitor = primaryMonitor;
         this._toggleOverlay = toggleOverlay;
@@ -44,7 +44,7 @@ export class CloseButton {
         this._overlay.connect('button-release-event', (actor, event) => {
           if (this._emptyAreaClose) {
             // Check if the overlay itself was clicked
-            if (actor === this._overlay) {
+            if (this._overlay.visible && actor === this._overlay) {
                 this._toggleOverlay();
             }
           }
