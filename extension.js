@@ -80,7 +80,7 @@ class GameBar extends PanelMenu.Button {
 
         // Create instances of addons and pass the overlay widget and the primary monitor
         this._clock = new Clock(this._overlay, primaryMonitor); // Clock addon
-        this._closeButton = new CloseButton(this._overlay, primaryMonitor); // Close button addon
+        this._closeButton = new CloseButton(this._overlay, primaryMonitor, this._toggleOverlay.bind(this)); // Close button addon
         this._soundControls = new SoundControls(this._overlay, primaryMonitor); // Sound controls addon
 
         // Add the overlay widget to the global stage to affect the input region.
