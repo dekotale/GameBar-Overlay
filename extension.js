@@ -24,6 +24,7 @@ function isGnome48OrNewer() {
     let version = Config.PACKAGE_VERSION.split('.').map(Number);
     return version[0] >= 48;
 }
+const MUTTER_SCHEMA = 'org.gnome.mutter';
 
 const GameBar = GObject.registerClass(
 class GameBar extends PanelMenu.Button {
@@ -48,6 +49,9 @@ class GameBar extends PanelMenu.Button {
 
         // Connect the 'button-press-event' signal of the GameBar panel button to the _toggleOverlay method
         this.connect('button-press-event', this._toggleOverlay.bind(this));
+
+        this._mutterSettings = new Gio.Settings({'schema': MUTTER_SCHEMA});
+        this._ignoreOverlayKeyChangedEvent = false;
     }
 
     /**
@@ -104,6 +108,37 @@ class GameBar extends PanelMenu.Button {
 
     }
 
+    _overrideOverlayKey() {
+        if (!this._overlay.visible){
+            return;
+        }
+
+        this.defaultOverlayKeyID = GObject.signal_handler_find(global.display, { signalId: 'overlay-key' });
+
+        if (!this.defaultOverlayKeyID) {
+            return;
+        }
+
+        GObject.signal_handler_block(global.display, this.defaultOverlayKeyID);
+
+        Main.wm.allowKeybinding('overlay-key', Shell.ActionMode.ALL);
+    }
+
+    _restoreOverlayKey() {
+        if (this.defaultOverlayKeyID) {
+            GObject.signal_handler_unblock(global.display, this.defaultOverlayKeyID);
+            this.defaultOverlayKeyID = null;
+        }
+
+        if (this._overlayKeyId) {
+            global.display.disconnect(this._overlayKeyId);
+            this._overlayKeyId = null;
+        }
+        
+        Main.wm.allowKeybinding('overlay-key', Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW);
+    }
+
+
     /**
      * Toggles the visibility of the overlay widget.
      * If the overlay is visible, it is hidden.
@@ -126,6 +161,9 @@ class GameBar extends PanelMenu.Button {
                 Meta.enable_unredirect_for_display(global.display);
             }
 
+            //When this overlay is not visible, restore the default GNOME overlay toggle key
+            this._restoreOverlayKey();
+
         } else {
             // Disable unredirect before showing the overlay to prevent fullscreen windows from obstructing the overlay.
             if (isGnome48OrNewer()){
@@ -143,6 +181,9 @@ class GameBar extends PanelMenu.Button {
 
             // Grab key focus
             global.stage.set_key_focus(this._overlay);
+
+            //Override the GNOME-default overlay toggle key when this overlay is visible
+            this._overrideOverlayKey();
         }
     }
 
