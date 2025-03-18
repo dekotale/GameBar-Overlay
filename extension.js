@@ -87,6 +87,13 @@ class GameBar extends PanelMenu.Button {
             //TODO:: fix bug: when change to a diferent resolution monitor, the size wont update properly
             this._updateOverlayGeometry(Main.layoutManager.primaryMonitor);
         });
+
+        // Connect to 'key-press-event' signal to close the overlay when ESC key is clicked
+        this._overlay.connect('key-press-event', (actor, event) => {
+            if (this._overlay.visible && event.get_key_symbol() === Clutter.KEY_Escape) {
+                this._toggleOverlay(); 
+            }
+        });
     }
 
     //Update overlay geometry
