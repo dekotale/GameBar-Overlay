@@ -7,6 +7,7 @@ export class CloseButton {
     constructor(overlay, primaryMonitor) {
         this._overlay = overlay;
         this._primaryMonitor = primaryMonitor;
+        this._toggleOverlay = toggleOverlay;
         this._closeButton = null;
         this._addonContainer = null;
         this._widthChangeId = null;
@@ -32,7 +33,7 @@ export class CloseButton {
 
         // Hide the overlay when the close button is clicked
         this._closeButton.connect('clicked', () => {
-            this._overlay.hide();
+            this._toggleOverlay();
         });
 
         this._addonContainer.add_child(this._closeButton)
@@ -44,7 +45,7 @@ export class CloseButton {
           if (this._emptyAreaClose) {
             // Check if the overlay itself was clicked
             if (actor === this._overlay) {
-                this._overlay.hide();
+                this._toggleOverlay();
             }
           }
         });
