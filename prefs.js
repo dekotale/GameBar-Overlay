@@ -313,5 +313,59 @@ export default class Preferences extends ExtensionPreferences {
             const selectedValue = soundIconTypeRow.model.get_string(selectedIndex);
             settings.set_string('sound-icon-type', selectedValue);
         });
+
+        // CPU Addon Page
+        const cpuPage = new Adw.PreferencesPage({
+            title: _('CPU Addon'),
+            icon_name: 'computer-symbolic',
+        });
+        window.add(cpuPage);
+
+        const cpuGroup = new Adw.PreferencesGroup({
+            title: _('CPU Settings'),
+            description: _('Configure the CPU addon'),
+        });
+        cpuPage.add(cpuGroup);
+
+        // CPU addon position
+        const cpuAddonPositionValues = [
+            'Top Left', 'Top Center', 'Top Right', 
+            'Center Left', 'Center Center', 'Center Right', 
+            'Bottom Left', 'Bottom Center', 'Bottom Right'
+        ];
+ 
+        const cpuAddonPosition = new Adw.ComboRow({
+            title: _('Position'),
+            subtitle: _('Position for the CPU stats in the overlay'),
+            model: new Gtk.StringList({strings: cpuAddonPositionValues}),
+        });
+
+        cpuAddonPosition.set_selected(cpuAddonPositionValues.indexOf(settings.get_string("cpu-addon-position")));
+        
+        cpuGroup.add(cpuAddonPosition);
+        settings.bind('cpu-addon-position', cpuAddonPosition, 'selected', Gio.SettingsBindFlags.DEFAULT);
+
+        cpuAddonPosition.connect('notify::selected', () => {
+            const selectedIndex = cpuAddonPosition.selected;
+            const selectedValue = cpuAddonPosition.model.get_string(selectedIndex);
+            settings.set_string('cpu-addon-position', selectedValue);
+        });
+
+        // Temperature Unit
+        const temperatureUnitValues = ['C', 'F'];
+        const temperatureUnitRow = new Adw.ComboRow({
+            title: _('Temperature Unit'),
+            subtitle: _('Select the temperature unit (Celsius or Fahrenheit)'),
+            model: new Gtk.StringList({ strings: temperatureUnitValues }),
+        });
+        temperatureUnitRow.set_selected(temperatureUnitValues.indexOf(settings.get_string('cpu-temperature-unit')));
+        cpuGroup.add(temperatureUnitRow);
+        settings.bind('cpu-temperature-unit', temperatureUnitRow, 'selected', Gio.SettingsBindFlags.DEFAULT);
+
+        temperatureUnitRow.connect('notify::selected', () => {
+            const selectedIndex = temperatureUnitRow.selected;
+            const selectedValue = temperatureUnitRow.model.get_string(selectedIndex);
+            settings.set_string('cpu-temperature-unit', selectedValue);
+        });
     }
 }
