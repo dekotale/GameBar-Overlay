@@ -317,7 +317,7 @@ export default class Preferences extends ExtensionPreferences {
         // CPU Addon Page
         const cpuPage = new Adw.PreferencesPage({
             title: _('CPU Addon'),
-            icon_name: 'processor-symbolic',
+            icon_name: 'computer-symbolic',
         });
         window.add(cpuPage);
 
