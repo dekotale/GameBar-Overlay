@@ -51,7 +51,7 @@ export class CPU {
         // Create the CPU title label
         this._cpuLabel = new St.Label({
             style_class: 'gamebar-cpu-label',
-            text: 'CPU'
+            text: _('CPU')
         });
 
         // Create CPU usage label
@@ -148,11 +148,11 @@ export class CPU {
 
     _getCpuTemperature() {
         if (!this._hwmonPath) {
-        return { temp: "N/A", unit: "" };
+        return { temp: _("N/A"), unit: "" };
         }
     const temperature = readFile(this._hwmonPath);
     if (temperature === null) {
-        return { temp: "Error", unit: "" };
+        return { temp: _("Error"), unit: "" };
         }
 
     let celsius = Math.round(parseInt(temperature) / 1000);
@@ -182,11 +182,11 @@ export class CPU {
         if (this._gtopAvailable && this._hwmonPath) {
         this._tempLabel.set_text(temp.temp + temp.unit);
         } else if (!this._gtopAvailable) {
-            this._tempLabel.set_text("GTop missing, install 'libgtop' for temperature");
+            this._tempLabel.set_text(_("GTop missing, install 'libgtop' for temperature"));
             this._cpuUsageLabel.set_text(""); //Dont show anything here when GTop is not available
         }
         else if (!this._hwmonPath) {
-            this._tempLabel.set_text("Temperature sensor not found");
+            this._tempLabel.set_text(_("Temperature sensor not found"));
         }
 
     return true;
