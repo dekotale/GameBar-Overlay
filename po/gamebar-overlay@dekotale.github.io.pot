@@ -1,0 +1,203 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-03-22 22:58+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: prefs.js:15
+msgid "General"
+msgstr ""
+
+#: prefs.js:22
+msgid "Appearance"
+msgstr ""
+
+#: prefs.js:23
+msgid "Configure the appearance of the extension"
+msgstr ""
+
+#: prefs.js:29
+msgid "Show Indicator"
+msgstr ""
+
+#: prefs.js:30
+msgid "Shows the GameBar Overlay indicator in the Top-Bar"
+msgstr ""
+
+#: prefs.js:38
+msgid "Padding"
+msgstr ""
+
+#: prefs.js:39
+msgid "Space inside the overlay separating addons from screen edges"
+msgstr ""
+
+#: prefs.js:66
+msgid "Overlay background color"
+msgstr ""
+
+#: prefs.js:76
+msgid "Behavior"
+msgstr ""
+
+#: prefs.js:77
+msgid "Configure the behavior of the overlay"
+msgstr ""
+
+#: prefs.js:99
+msgid "Close on Empty Area Click"
+msgstr ""
+
+#: prefs.js:100
+msgid "Close the overlay by clicking on an empty area"
+msgstr ""
+
+#: prefs.js:108
+msgid "Keybinding"
+msgstr ""
+
+#: prefs.js:109
+msgid "Configure the keybinding of the overlay"
+msgstr ""
+
+#: prefs.js:122
+msgid "First key"
+msgstr ""
+
+#: prefs.js:149
+msgid "Last key"
+msgstr ""
+
+#: prefs.js:176
+msgid "Clock Addon"
+msgstr ""
+
+#: prefs.js:182
+msgid "Clock Settings"
+msgstr ""
+
+#: prefs.js:183
+msgid "Configure the clock addon"
+msgstr ""
+
+#: prefs.js:195 prefs.js:253 prefs.js:338
+msgid "Position"
+msgstr ""
+
+#: prefs.js:196
+msgid "Position for the clock in the overlay"
+msgstr ""
+
+#: prefs.js:213
+msgid "Show Seconds"
+msgstr ""
+
+#: prefs.js:214
+msgid "Show seconds in the clock addon"
+msgstr ""
+
+#: prefs.js:221
+msgid "Font Size"
+msgstr ""
+
+#: prefs.js:222
+msgid "Font size for the clock"
+msgstr ""
+
+#: prefs.js:235
+msgid "Sound Controls"
+msgstr ""
+
+#: prefs.js:241
+msgid "Sound Control Settings"
+msgstr ""
+
+#: prefs.js:242
+msgid "Configure the sound control panel"
+msgstr ""
+
+#: prefs.js:254
+msgid "Position for the sound panel in the overlay"
+msgstr ""
+
+#: prefs.js:271
+msgid "Icon Size"
+msgstr ""
+
+#: prefs.js:272
+msgid "Icon size for the sound controls"
+msgstr ""
+
+#: prefs.js:293
+msgid "Experimental settings"
+msgstr ""
+
+#: prefs.js:294
+msgid ""
+"These settings are experimental WIP features and may dont work as expected"
+msgstr ""
+
+#: prefs.js:301
+msgid "Icon Type"
+msgstr ""
+
+#: prefs.js:302
+msgid "Select the icon type: Default or Symbolic"
+msgstr ""
+
+#: prefs.js:319
+msgid "CPU Addon"
+msgstr ""
+
+#: prefs.js:325
+msgid "CPU Settings"
+msgstr ""
+
+#: prefs.js:326
+msgid "Configure the CPU addon"
+msgstr ""
+
+#: prefs.js:339
+msgid "Position for the CPU stats in the overlay"
+msgstr ""
+
+#: prefs.js:357
+msgid "Temperature Unit"
+msgstr ""
+
+#: prefs.js:358
+msgid "Select the temperature unit (Celsius or Fahrenheit)"
+msgstr ""
+
+#: addons/cpu.js:54
+msgid "CPU"
+msgstr ""
+
+#: addons/cpu.js:151
+msgid "N/A"
+msgstr ""
+
+#: addons/cpu.js:155
+msgid "Error"
+msgstr ""
+
+#: addons/cpu.js:185
+msgid "GTop missing, install 'libgtop' for temperature"
+msgstr ""
+
+#: addons/cpu.js:189
+msgid "Temperature sensor not found"
+msgstr ""

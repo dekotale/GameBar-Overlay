@@ -63,7 +63,7 @@ export default class Preferences extends ExtensionPreferences {
         });
 
         const overlayBackgroundColorRow = new Adw.ActionRow({
-            title: 'Overlay background color',
+            title: _('Overlay background color'),
             activatable_widget: colorButton
         });
 

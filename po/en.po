@@ -1,0 +1,203 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-03-22 22:58+0100\n"
+"PO-Revision-Date: 2025-03-22 23:09+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
+
+#: prefs.js:15
+msgid "General"
+msgstr "General"
+
+#: prefs.js:22
+msgid "Appearance"
+msgstr "Apperance"
+
+#: prefs.js:23
+msgid "Configure the appearance of the extension"
+msgstr "Configure the appearance of the extension"
+
+#: prefs.js:29
+msgid "Show Indicator"
+msgstr "Show Indicator"
+
+#: prefs.js:30
+msgid "Shows the GameBar Overlay indicator in the Top-Bar"
+msgstr "Shows the GameBar Overlay indicator in the Top-Bar"
+
+#: prefs.js:38
+msgid "Padding"
+msgstr "Padding"
+
+#: prefs.js:39
+msgid "Space inside the overlay separating addons from screen edges"
+msgstr "Space inside the overlay separating addons from screen edges"
+
+#: prefs.js:66
+msgid "Overlay background color"
+msgstr "Overlay background color"
+
+#: prefs.js:76
+msgid "Behavior"
+msgstr "Behavior"
+
+#: prefs.js:77
+msgid "Configure the behavior of the overlay"
+msgstr "Configure the behavior of the overlay"
+
+#: prefs.js:99
+msgid "Close on Empty Area Click"
+msgstr "Close on Empty Area Click"
+
+#: prefs.js:100
+msgid "Close the overlay by clicking on an empty area"
+msgstr "Close the overlay by clicking on an empty area"
+
+#: prefs.js:108
+msgid "Keybinding"
+msgstr "Keybinding"
+
+#: prefs.js:109
+msgid "Configure the keybinding of the overlay"
+msgstr "Configure the keybinding of the overlay"
+
+#: prefs.js:122
+msgid "First key"
+msgstr "First key"
+
+#: prefs.js:149
+msgid "Last key"
+msgstr "Last key"
+
+#: prefs.js:176
+msgid "Clock Addon"
+msgstr "Clock Addon"
+
+#: prefs.js:182
+msgid "Clock Settings"
+msgstr "Clock Settings"
+
+#: prefs.js:183
+msgid "Configure the clock addon"
+msgstr "Configure the clock addon"
+
+#: prefs.js:195 prefs.js:253 prefs.js:338
+msgid "Position"
+msgstr "Position"
+
+#: prefs.js:196
+msgid "Position for the clock in the overlay"
+msgstr "Position for the clock in the overlay"
+
+#: prefs.js:213
+msgid "Show Seconds"
+msgstr "Show Seconds"
+
+#: prefs.js:214
+msgid "Show seconds in the clock addon"
+msgstr "Show seconds in the clock addon"
+
+#: prefs.js:221
+msgid "Font Size"
+msgstr "Font Size"
+
+#: prefs.js:222
+msgid "Font size for the clock"
+msgstr "Font size for the clock"
+
+#: prefs.js:235
+msgid "Sound Controls"
+msgstr "Sound Controls"
+
+#: prefs.js:241
+msgid "Sound Control Settings"
+msgstr "Sound Control Settings"
+
+#: prefs.js:242
+msgid "Configure the sound control panel"
+msgstr "Configure the sound control panel"
+
+#: prefs.js:254
+msgid "Position for the sound panel in the overlay"
+msgstr "Position for the sound panel in the overlay"
+
+#: prefs.js:271
+msgid "Icon Size"
+msgstr "Icon Size"
+
+#: prefs.js:272
+msgid "Icon size for the sound controls"
+msgstr "Icon size for the sound controls"
+
+#: prefs.js:293
+msgid "Experimental settings"
+msgstr "Experimental settings"
+
+#: prefs.js:294
+msgid "These settings are experimental WIP features and may dont work as expected"
+msgstr "These settings are experimental WIP features and may dont work as expected"
+
+#: prefs.js:301
+msgid "Icon Type"
+msgstr "Icon Type"
+
+#: prefs.js:302
+msgid "Select the icon type: Default or Symbolic"
+msgstr "Select the icon type: Default or Symbolic"
+
+#: prefs.js:319
+msgid "CPU Addon"
+msgstr "CPU Addon"
+
+#: prefs.js:325
+msgid "CPU Settings"
+msgstr "CPU Settings"
+
+#: prefs.js:326
+msgid "Configure the CPU addon"
+msgstr "Configure the CPU addon"
+
+#: prefs.js:339
+msgid "Position for the CPU stats in the overlay"
+msgstr "Position for the CPU stats in the overlay"
+
+#: prefs.js:357
+msgid "Temperature Unit"
+msgstr "Temperature Unit"
+
+#: prefs.js:358
+msgid "Select the temperature unit (Celsius or Fahrenheit)"
+msgstr "Select the temperature unit (Celsius or Fahrenheit)"
+
+#: addons/cpu.js:54
+msgid "CPU"
+msgstr "CPU"
+
+#: addons/cpu.js:151
+msgid "N/A"
+msgstr "N/A"
+
+#: addons/cpu.js:155
+msgid "Error"
+msgstr "Error"
+
+#: addons/cpu.js:185
+msgid "GTop missing, install 'libgtop' for temperature"
+msgstr "GTop missing, install 'libgtop' for temperature"
+
+#: addons/cpu.js:189
+msgid "Temperature sensor not found"
+msgstr "Temperature sensor not found"

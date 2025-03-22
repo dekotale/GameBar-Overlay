@@ -46,6 +46,18 @@ Contributions are welcome! Here's how you can help:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+### Translations
+
+1. Copy `po/gamebar-overlay@dekotale.github.io.pot` into the new `.po` translation file. Example: `en.po`
+2. Use a po editor software or text editor to translate all the strings into the new language.
+3. Compile the Translation (MO file):  You need to compile your `.po` file into a binary `.mo` file.  You *can* do this using the `gnome-extensions` tool, but it's **much easier** with a PO editor, which usually has a "Compile to MO" option.  If you *must* use the command line, do the following:
+    * Run: `gnome-extensions pack --podir=po gamebar-overlay@dekotale.github.io`
+    * This creates a `.zip` file.  Extract the `locale` folder from the `.zip`.
+    * Merge the extracted `locale` folder with the `locale` folder in your *local copy* of the extension's repository.  Ensure the new language directory (e.g., `locale/es/LC_MESSAGES/`) and the `.mo` file (e.g., `locale/es/LC_MESSAGES/gamebar-overlay@dekotale.github.io.mo`) are in the correct place.  *Make sure the directory structure is correct.*
+4. Create a branch called: `translation_{language}`, add the files and do the commits.
+5. Submit the pull request and await approval.
+
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
