@@ -71,6 +71,81 @@ export default class Preferences extends ExtensionPreferences {
         overlayBackgroundColorRow.add_suffix(colorButton);
         appearanceGroup.add(overlayBackgroundColorRow);
 
+        // Animations
+        const animationValues = ['None', 'Fade', 'Slide'];
+
+        // Enter Animation
+        const enterAnimationRow = new Adw.ComboRow({
+            title: _('Enter Animation'),
+            subtitle: _('Select the animation type to show when opening the overlay'),
+            model: new Gtk.StringList({strings: animationValues}),
+        });
+
+        if (animationValues.indexOf(settings.get_string("enter-animation")) === -1) {
+            settings.set_string("enter-animation", "None");
+        }
+
+        enterAnimationRow.set_selected(animationValues.indexOf(settings.get_string("enter-animation")));
+        appearanceGroup.add(enterAnimationRow);
+        settings.bind('enter-animation', enterAnimationRow, 'selected', Gio.SettingsBindFlags.DEFAULT);
+
+        enterAnimationRow.connect('notify::selected', () => {
+            const selectedIndex = enterAnimationRow.selected;
+            const selectedValue = enterAnimationRow.model.get_string(selectedIndex);
+            settings.set_string('enter-animation', selectedValue);
+        });
+
+        // Enter Animation Duration
+        const enterAnimationDurationRow = new Adw.SpinRow({
+            title: _('Enter Animation Duration'),
+            subtitle: _('Duration of the enter animation in milliseconds'),
+            adjustment: new Gtk.Adjustment({
+                lower: 0,
+                upper: 5000,
+                step_increment: 50,
+                page_increment: 100,
+            }),
+        });
+        appearanceGroup.add(enterAnimationDurationRow);
+        settings.bind('enter-animation-duration', enterAnimationDurationRow, 'value', Gio.SettingsBindFlags.DEFAULT);
+
+        // Exit Animation
+        const exitAnimationRow = new Adw.ComboRow({
+            title: _('Exit Animation'),
+            subtitle: _('Select the animation type to show when closing the overlay'),
+            model: new Gtk.StringList({strings: animationValues}),
+        });
+
+        if (animationValues.indexOf(settings.get_string("exit-animation")) === -1) {
+            settings.set_string("exit-animation", "None");
+        }
+
+        exitAnimationRow.set_selected(animationValues.indexOf(settings.get_string("exit-animation")));
+        appearanceGroup.add(exitAnimationRow);
+        settings.bind('exit-animation', exitAnimationRow, 'selected', Gio.SettingsBindFlags.DEFAULT);
+
+        exitAnimationRow.connect('notify::selected', () => {
+            const selectedIndex = exitAnimationRow.selected;
+            const selectedValue = exitAnimationRow.model.get_string(selectedIndex);
+            settings.set_string('exit-animation', selectedValue);
+        });
+
+        // Exit Animation Duration
+        const exitAnimationDurationRow = new Adw.SpinRow({
+            title: _('Exit Animation Duration'),
+            subtitle: _('Duration of the exit animation in milliseconds'),
+            adjustment: new Gtk.Adjustment({
+                lower: 0,
+                upper: 5000,
+                step_increment: 50,
+                page_increment: 100,
+            }),
+        });
+        appearanceGroup.add(exitAnimationDurationRow);
+        settings.bind('exit-animation-duration', exitAnimationDurationRow, 'value', Gio.SettingsBindFlags.DEFAULT);
+
+
+
         // Behavior Group
         const behaviorGroup = new Adw.PreferencesGroup({
             title: _('Behavior'),

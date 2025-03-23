@@ -152,7 +152,7 @@ class GameBar extends PanelMenu.Button {
             // Unset key focus
             global.stage.set_key_focus(null);
             // If visible, hide the overlay
-            this._overlay.hide();
+            this._hideOverlayWithAnimation();  // Use animation-based hiding
 
             // Enable unredirect back when the overlay is closed.
             if (isGnome48OrNewer()){
@@ -177,7 +177,7 @@ class GameBar extends PanelMenu.Button {
             }
 
             // If not visible, show the overlay and update the clock and volume controls
-            this._overlay.show();
+            this._showOverlayWithAnimation();
             this._clock._updateClock();
             this._soundControls.updateVolumeControls();
 
@@ -188,6 +188,128 @@ class GameBar extends PanelMenu.Button {
             this._overrideOverlayKey();
         }
     }
+
+
+    _showOverlayWithAnimation() {
+        if (!this._overlay) return;
+
+        // Reset all children to default state before showing
+        this._resetOverlayChildren();
+
+        this._overlay.show();
+
+        const animationType = this._enterAnimation;
+        const animationDuration = this._enterAnimationDuration;
+
+        if (animationType === 'Fade') {
+            this._overlay.get_children().forEach(child => {
+                child.set_opacity(0);
+                child.set_scale(0.8, 0.8);
+
+                child.ease({
+                    opacity: 255,
+                    scale_x: 1,
+                    scale_y: 1,
+                    duration: animationDuration,
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                });
+            });
+        } else if (animationType === 'Slide') {
+            this._overlay.get_children().forEach(child => {
+
+                // Determine slide direction and initial position
+                if (child.y < this._overlay.height / 3) {
+                    child.set_translation(0, -child.height, 0);
+                } else if (child.y > this._overlay.height * 2 / 3) {
+                    child.set_translation(0, this._overlay.height, 0);
+                } else if (child.x < this._overlay.width / 3) {
+                    child.set_translation(-child.width, 0, 0);
+                } else if (child.x > this._overlay.width * 2 / 3) {
+                    child.set_translation(this._overlay.width, 0, 0);
+                } else {
+                    child.set_translation(0, -child.height, 0);
+                }
+
+                child.ease({
+                    translation_x: 0,
+                    translation_y: 0,
+                    opacity: 255,
+                    duration: animationDuration,
+                    mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
+                });
+            });
+        }
+    }
+
+
+    _hideOverlayWithAnimation() {
+        if (!this._overlay) return;
+        global.stage.set_key_focus(null);
+
+        const animationType = this._exitAnimation;
+        const animationDuration = this._exitAnimationDuration;
+
+        if (animationType === 'Fade') {
+            this._overlay.get_children().forEach(child => {
+                child.ease({
+                    opacity: 0,
+                    scale_x: 0.8,
+                    scale_y: 0.8,
+                    duration: animationDuration,
+                    mode: Clutter.AnimationMode.EASE_IN_QUAD,
+                    onComplete: () => {
+                        if (this._overlay && this._overlay.get_children().every(c => c.opacity === 0)) {
+                            this._overlay.hide();
+                        }
+                    }
+                });
+            });
+        } else if (animationType === 'Slide') {
+            this._overlay.get_children().forEach(child => {
+                let translationX = 0;
+                let translationY = 0;
+
+                if (child.y < this._overlay.height / 3) {
+                    translationY = -child.height;
+                } else if (child.y > this._overlay.height * 2 / 3) {
+                    translationY = this._overlay.height;
+                } else if (child.x < this._overlay.width / 3) {
+                    translationX = -child.width;
+                } else if (child.x > this._overlay.width * 2 / 3) {
+                    translationX = this._overlay.width;
+                } else {
+                    translationY = -child.height;
+                }
+
+                child.ease({
+                    opacity: 0,
+                    translation_x: translationX,
+                    translation_y: translationY,
+                    duration: animationDuration,
+                    mode: Clutter.AnimationMode.EASE_IN_CUBIC,
+                    onComplete: () => {
+                        if (this._overlay && this._overlay.get_children().every(c => c.opacity === 0)) {
+                            this._overlay.hide();
+                        }
+                    }
+                });
+            });
+        } else { // None
+            this._overlay.hide();
+        }
+    }
+
+    _resetOverlayChildren() {
+        if (!this._overlay) return;
+
+        this._overlay.get_children().forEach(child => {
+            child.set_opacity(255);
+            child.set_scale(1, 1);
+            child.set_pivot_point(0.5, 0.5);
+            child.set_translation(0, 0, 0);
+        });
+    }
+
 
     /**
      * Loads the settings
@@ -212,7 +334,11 @@ class GameBar extends PanelMenu.Button {
         this._soundControls._updateSettings(settings);
         this._closeButton._updateSettings(settings);
         this._cpu._updateSettings(settings);
-        set_padding_setting(settings.get_int('overlay-padding'))
+        set_padding_setting(settings.get_int('overlay-padding'));
+        this._enterAnimation = settings.get_string('enter-animation');
+        this._enterAnimationDuration = settings.get_int('enter-animation-duration');
+        this._exitAnimation = settings.get_string('exit-animation');
+        this._exitAnimationDuration = settings.get_int('exit-animation-duration');
 
         //Update overlay settings
 

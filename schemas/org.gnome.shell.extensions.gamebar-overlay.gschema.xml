@@ -85,6 +85,30 @@
       <description>Background color of the overlay</description>
     </key>
 
+    <key name="enter-animation" type="s">
+      <default>'Fade'</default>
+      <summary>Enter animation type</summary>
+      <description>Select the animation type to show when open the overlay</description>
+    </key>
+
+    <key name="enter-animation-duration" type="i">
+      <default>250</default>
+      <summary>Enter animation duration in ms</summary>
+      <description>Determine the enter animation duration in ms</description>
+    </key>
+
+    <key name="exit-animation" type="s">
+      <default>'Fade'</default>
+      <summary>Exit animation type</summary>
+      <description>Select the animation type to show when hide the overlay</description>
+    </key>
+
+    <key name="exit-animation-duration" type="i">
+      <default>250</default>
+      <summary>Exit animation duration in ms</summary>
+      <description>Determine the exit animation duration in ms</description>
+    </key>
+
     <key name="toggle-gamebar" type="as">
       <default><![CDATA[['<Super>g']]]></default>
       <summary>Keyboard shortcut to toggle the GameBar overlay</summary>
