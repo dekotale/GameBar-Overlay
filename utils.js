@@ -70,7 +70,7 @@ const listDir = (path) => {
 };
 
 const findHwmon = () => {
-    const drivers = ['zenpower', 'k10temp'];
+    const drivers = ['zenpower', 'k10temp', 'coretemp'];
     let hwmonPath = null;
     try {
         const hwmonDirs = listDir("/sys/class/hwmon/");
