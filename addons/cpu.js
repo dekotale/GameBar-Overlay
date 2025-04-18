@@ -20,8 +20,13 @@ export class CPU {
         this._cpuContainer = null;
         this._cpuUsageLabel = null;
         this._cpuLabel = null;
-        this._tempContainer = null;
-        this._tempLabel = null;
+        this._cpuTempLabel = null;
+
+        this._gpuContainer = null;
+        this._gpuUsageLabel = null;
+        this._gpuLabel = null;
+        this._gpuTempLabel = null;
+        
         this._timeoutId = null;
         this._addonContainer = null;
         this._visibilityChangedId = null;
@@ -36,11 +41,17 @@ export class CPU {
         if (this._gtopAvailable) {
             this._prevCpu = new GTop.default.glibtop_cpu();
         }
-        this._hwmonPath = findHwmon();
+        this._hwmonPath = findHwmon('zenpower', 'k10temp', 'coretemp');
 
         this._addonContainer = new St.Widget({
             layout_manager: new Clutter.BinLayout()
         });
+
+        this._hwmonContainer = new St.BoxLayout({
+          vertical: false
+        });
+
+        // ------------- CPU
 
         // Create a container for CPU stats
         this._cpuContainer = new St.BoxLayout({
@@ -60,15 +71,48 @@ export class CPU {
         });
 
         // Create CPU temperature label (or GTop missing message)
-        this._tempLabel = new St.Label({
+        this._cpuTempLabel = new St.Label({
             style_class: 'gamebar-cpu-temp'
         });
 
         this._cpuContainer.add_child(this._cpuLabel);
         this._cpuContainer.add_child(this._cpuUsageLabel);
-        this._cpuContainer.add_child(this._tempLabel);
+        this._cpuContainer.add_child(this._cpuTempLabel);
 
-        this._addonContainer.add_child(this._cpuContainer);
+        // -------------- GPU
+
+        // Create a container for CPU stats
+        this._gpuContainer = new St.BoxLayout({
+            vertical: true,
+            style_class: 'gamebar-cpu-container'
+        });
+
+        // Create the CPU title label
+        this._gpuLabel = new St.Label({
+            style_class: 'gamebar-cpu-label',
+            text: _('GPU')
+        });
+
+        // Create CPU usage label
+        this._gpuUsageLabel = new St.Label({
+            style_class: 'gamebar-cpu-usage',
+        });
+
+        // Create CPU temperature label (or GTop missing message)
+        this._gpuTempLabel = new St.Label({
+            style_class: 'gamebar-cpu-temp'
+        });
+
+        this._gpuContainer.add_child(this._gpuLabel);
+        this._gpuContainer.add_child(this._gpuUsageLabel);
+        this._gpuContainer.add_child(this._gpuTempLabel);
+
+        // containers
+        this._hwmonContainer.add_child(this._cpuContainer);
+
+        this._hwmonContainer.add_child(this._gpuContainer);
+
+        this._addonContainer.add_child(this._hwmonContainer);
 
         // Add the addon container to the overlay
         this._overlay.add_child(this._addonContainer);
@@ -169,31 +213,57 @@ export class CPU {
     return { temp: tempValue, unit: unitSymbol};
     }
 
+    _getGpuUsage() {
+      const path = "/sys/class/drm/card0/device/gpu_busy_percent"; // TODO: un-hardcode
+      const usage = readFile(path);
+      return usage;
+    }
+
+    _getGpuTemperature() {
+      const path = "/sys/class/drm/card0/device/hwmon/hwmon2/temp1_input";
+      const temperature = readFile(path);
+      const celsius = Math.round(parseInt(temperature) / 1000);
+
+      let tempValue;
+      let unitSymbol;
+  
+      if (this._tempUnit === 'C') {
+          tempValue = celsius;
+          unitSymbol = "°C";
+      } else { // Fahrenheit
+          tempValue = Math.round(celsiusToFahrenheit(celsius));
+          unitSymbol = "°F";
+      }
+      return { temp: tempValue, unit: unitSymbol};
+    }
+
   _updateMonitor() {
     // Only update if the overlay is visible
     if (!this._overlay.visible) {
       return false;
     }
 
-        // Update the clock widget with the new time
-        this._cpuUsageLabel.set_text(this._getCpuUsage() + "%");
+    this._cpuUsageLabel.set_text(this._getCpuUsage() + "%");
     const temp = this._getCpuTemperature();
 
-        if (this._gtopAvailable && this._hwmonPath) {
-        this._tempLabel.set_text(temp.temp + temp.unit);
-        } else if (!this._gtopAvailable) {
-            this._tempLabel.set_text(_("GTop missing, install 'libgtop' for temperature"));
-            this._cpuUsageLabel.set_text(""); //Dont show anything here when GTop is not available
-        }
-        else if (!this._hwmonPath) {
-            this._tempLabel.set_text(_("Temperature sensor not found"));
-        }
+    if (this._gtopAvailable && this._hwmonPath) {
+      this._cpuTempLabel.set_text(temp.temp + temp.unit);
+    } else if (!this._gtopAvailable) {
+      this._cpuTempLabel.set_text(_("GTop missing, install 'libgtop' for temperature"));
+      this._cpuUsageLabel.set_text(""); //Dont show anything here when GTop is not available
+    } else if (!this._hwmonPath) {
+      this._cpuTempLabel.set_text(_("Temperature sensor not found"));
+    }
+
+    this._gpuUsageLabel.set_text(this._getGpuUsage() + "%");
+    const gpuTemp = this._getGpuTemperature();
+    this._gpuTempLabel.set_text(gpuTemp.temp + gpuTemp.unit);
 
     return true;
   }
 
-    _updateSettings(settings) {
-        this._position = settings.get_string('cpu-addon-position');
+  _updateSettings(settings) {
+    this._position = settings.get_string('cpu-addon-position');
     this._tempUnit = settings.get_string('cpu-temperature-unit'); // Get unit from settings
 
     // Recreate the widget with new settings
@@ -202,7 +272,7 @@ export class CPU {
     this._createCPUWidget();
   }
 
-destroy() {
+  destroy() {
     // Stop the monitor
     this._stopMonitor();
 
@@ -233,10 +303,10 @@ destroy() {
         this._cpuLabel.destroy();
         this._cpuLabel = null;
     }
-    if (this._tempLabel) {
-        this._cpuContainer.remove_child(this._tempLabel);
-        this._tempLabel.destroy();
-        this._tempLabel = null;
+    if (this._cpuTempLabel) {
+        this._cpuContainer.remove_child(this._cpuTempLabel);
+        this._cpuTempLabel.destroy();
+        this._cpuTempLabel = null;
     }
     if (this._cpuContainer) {
       this._addonContainer.remove_child(this._cpuContainer)
@@ -257,3 +327,4 @@ destroy() {
     this._hwmonPath = null;
   }
 }
+
