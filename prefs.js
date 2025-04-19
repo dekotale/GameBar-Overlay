@@ -5,6 +5,7 @@ import Gdk from 'gi://Gdk';
 import GLib from 'gi://GLib';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { listGpus } from './utils.js';
 
 export default class Preferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -442,5 +443,35 @@ export default class Preferences extends ExtensionPreferences {
             const selectedValue = temperatureUnitRow.model.get_string(selectedIndex);
             settings.set_string('cpu-temperature-unit', selectedValue);
         });
+    
+        // GPU selector
+        const gpuGroup = new Adw.PreferencesGroup({
+            title: _('GPU Settings'),
+            description: _('Configure the GPU addon'),
+        });
+        cpuPage.add(gpuGroup);
+
+        const gpuModel = new Gtk.StringList();
+        const gpuList = listGpus();
+        gpuList.forEach(([id]) => {
+            gpuModel.append(id);
+        });
+
+        const gpuRow = new Adw.ComboRow({
+            title: _('GPU'),
+            subtitle: _('Select which GPU to monitor'),
+            model: gpuModel,
+        });
+
+        const currentGpu = settings.get_string('gpu-device');
+        const index = gpuList.findIndex(([id]) => id === currentGpu);
+        gpuRow.set_selected(index >= 0 ? index : 0);
+
+        gpuRow.connect('notify::selected', () => {
+            const selectedId = gpuModel.get_string(gpuRow.selected);
+            settings.set_string('gpu-device', selectedId);
+        });
+        settings.bind('gpu-device', gpuRow, 'selected', Gio.SettingsBindFlags.DEFAULT);
+        gpuGroup.add(gpuRow);
     }
 }

@@ -37,6 +37,12 @@
         <description>Select the temperature unit for the CPU addon (C for Celsius, F for Fahrenheit)</description>
     </key>
 
+    <key name="gpu-device" type="s">
+        <default>'card0'</default>
+        <summary>Default GPU device</summary>
+        <description>Select the default GPU device to be monitored</description>
+    </key>
+
     <key name="sound-icon-type" type="s">
       <default>'Default'</default>
       <summary>Icon type</summary>

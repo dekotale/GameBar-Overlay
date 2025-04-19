@@ -69,17 +69,18 @@ const listDir = (path) => {
     }
 };
 
+// Find the correct hwmon CPU temperature sensor if supportedf by the driver.
 const findHwmon = () => {
     const drivers = ['zenpower', 'k10temp', 'coretemp'];
     let hwmonPath = null;
     try {
-        const hwmonDirs = listDir("/sys/class/hwmon/");
+        const hwmonDirs = listDir('/sys/class/hwmon/');
         if (!hwmonDirs) {
             return null;
         }
         for (const hwmonDir of hwmonDirs) {
-            const hwmonBasePath = "/sys/class/hwmon/" + hwmonDir.get_name();
-            const driverName = readFile(hwmonBasePath + "/name");
+            const hwmonBasePath = '/sys/class/hwmon/' + hwmonDir.get_name();
+            const driverName = readFile(hwmonBasePath + '/name');
             if (driverName && drivers.includes(driverName)) {
                 hwmonPath = hwmonBasePath + '/temp1_input';
                 break;
@@ -91,9 +92,46 @@ const findHwmon = () => {
     return hwmonPath;
 };
 
+// Get the GPU driver name (eg. amdgpu/nvidia/i915/xe)
+const getGpuDriver = (drm_id) => {
+    // /sys/class/drm/card*/device/driver is a symlink to the kernel module and needs to be resolved.
+    const path = '/sys/class/drm/' + drm_id + "/device/driver";
+    const driverPath = Gio.File.new_for_path(path);
+    const driverPathInfo = driverPath.query_info(
+        'standard::symlink-target',
+        Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
+        null
+    );
+
+    const driverName = driverPathInfo.get_symlink_target().split('/').pop();
+    return driverName;
+}
+
+// List all GPUs with supported drivers.
+const listGpus = () => {
+    const drivers = ['amdgpu', 'nvidia', 'i915', 'xe'];
+    const devices = [];
+
+    const drmDevices = listDir('/sys/class/drm/');
+    for (const device of drmDevices) {
+        // Only enumerate card0, card1 etc...
+        if (!/^card\d+$/.test(device.get_name())) {
+            continue;
+        }
+
+        const driverName = getGpuDriver(device.get_name());
+        if (drivers.includes(driverName)) {
+            // example: ['card0', 'amdgpu']
+            devices.push([device.get_name(), driverName])
+            continue;
+        }
+    }
+    return devices;
+}
+
 // Celsius to Fahrenheit conversion
 const celsiusToFahrenheit = (celsius) => {
     return (celsius * 9/5) + 32;
 };
 
-export { getPositionStyle, set_padding_setting, readFile, listDir, findHwmon, celsiusToFahrenheit };
+export { getPositionStyle, set_padding_setting, readFile, listDir, findHwmon, getGpuDriver, listGpus, celsiusToFahrenheit };

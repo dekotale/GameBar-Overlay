@@ -1,7 +1,7 @@
 import St from 'gi://St';
 import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
-import { getPositionStyle, readFile, listDir, findHwmon, celsiusToFahrenheit } from '../utils.js';
+import { getPositionStyle, readFile, getGpuDriver, findHwmon, celsiusToFahrenheit } from '../utils.js';
 
 // Import GTop conditionally
 let GTop = null;
@@ -26,6 +26,7 @@ export class CPU {
         this._gpuUsageLabel = null;
         this._gpuLabel = null;
         this._gpuTempLabel = null;
+        this._gpuDevice = null;
         
         this._timeoutId = null;
         this._addonContainer = null;
@@ -41,7 +42,7 @@ export class CPU {
         if (this._gtopAvailable) {
             this._prevCpu = new GTop.default.glibtop_cpu();
         }
-        this._hwmonPath = findHwmon('zenpower', 'k10temp', 'coretemp');
+        this._hwmonPath = findHwmon();
 
         this._addonContainer = new St.Widget({
             layout_manager: new Clutter.BinLayout()
@@ -81,24 +82,24 @@ export class CPU {
 
         // -------------- GPU
 
-        // Create a container for CPU stats
+        // Create a container for GPU stats
         this._gpuContainer = new St.BoxLayout({
             vertical: true,
             style_class: 'gamebar-cpu-container'
         });
 
-        // Create the CPU title label
+        // Create the GPU title label
         this._gpuLabel = new St.Label({
             style_class: 'gamebar-cpu-label',
             text: _('GPU')
         });
 
-        // Create CPU usage label
+        // Create GPU usage label
         this._gpuUsageLabel = new St.Label({
             style_class: 'gamebar-cpu-usage',
         });
 
-        // Create CPU temperature label (or GTop missing message)
+        // Create GPU temperature label (or GTop missing message)
         this._gpuTempLabel = new St.Label({
             style_class: 'gamebar-cpu-temp'
         });
@@ -107,11 +108,11 @@ export class CPU {
         this._gpuContainer.add_child(this._gpuUsageLabel);
         this._gpuContainer.add_child(this._gpuTempLabel);
 
-        // containers
+        // Add the CPU container and the GPU container to the main container
         this._hwmonContainer.add_child(this._cpuContainer);
-
         this._hwmonContainer.add_child(this._gpuContainer);
 
+        // Add the main container to the addon container
         this._addonContainer.add_child(this._hwmonContainer);
 
         // Add the addon container to the overlay
@@ -173,12 +174,13 @@ export class CPU {
     this._addonContainer.set_position(position_style.x, position_style.y);
   }
 
-    _getCpuUsage() {
-        if (!this._gtopAvailable){
-            return '-';
-        }
-        const cpu = new GTop.default.glibtop_cpu();
-        GTop.default.glibtop_get_cpu(cpu);
+  _getCpuUsage() {
+    if (!this._gtopAvailable){
+      return '-';
+    }
+
+    const cpu = new GTop.default.glibtop_cpu();
+    GTop.default.glibtop_get_cpu(cpu);
 
     const total = cpu.total - this._prevCpu.total;
     const user = cpu.user - this._prevCpu.user;
@@ -190,40 +192,52 @@ export class CPU {
     return Math.round((user + sys + nice) / Math.max(total, 1.0) * 100);
   }
 
-    _getCpuTemperature() {
-        if (!this._hwmonPath) {
-        return { temp: _("N/A"), unit: "" };
-        }
+  _getCpuTemperature() {
+    if (!this._hwmonPath) {
+      return { temp: _("N/A"), unit: "" };
+    }
+
     const temperature = readFile(this._hwmonPath);
     if (temperature === null) {
-        return { temp: _("Error"), unit: "" };
-        }
+      return { temp: _("Error"), unit: "" };
+    }
 
     let celsius = Math.round(parseInt(temperature) / 1000);
     let tempValue;
     let unitSymbol;
 
     if (this._tempUnit === 'C') {
-        tempValue = celsius;
-        unitSymbol = "°C";
+      tempValue = celsius;
+      unitSymbol = "°C";
     } else { // Fahrenheit
-        tempValue = Math.round(celsiusToFahrenheit(celsius));
-        unitSymbol = "°F";
+      tempValue = Math.round(celsiusToFahrenheit(celsius));
+      unitSymbol = "°F";
     }
     return { temp: tempValue, unit: unitSymbol};
     }
 
     _getGpuUsage() {
-      const path = "/sys/class/drm/card0/device/gpu_busy_percent"; // TODO: un-hardcode
-      const usage = readFile(path);
-      return usage;
+      const driver = getGpuDriver(this._gpuDevice);
+      // TODO: Support more drivers.
+      if (driver == "amdgpu") {
+        const usagePath = "/sys/class/drm/" + this._gpuDevice + "/device/gpu_busy_percent"
+        const usage = readFile(usagePath);
+        return usage;
+      }
+      return "-"
     }
 
     _getGpuTemperature() {
-      const path = "/sys/class/drm/card0/device/hwmon/hwmon2/temp1_input";
-      const temperature = readFile(path);
-      const celsius = Math.round(parseInt(temperature) / 1000);
+      const driver = getGpuDriver(this._gpuDevice);
+      let temperature;
 
+      // TODO: Support more drivers.
+      if (driver == "amdgpu") {
+        const path = "/sys/class/drm/" + this._gpuDevice + "/device/hwmon/hwmon2/temp1_input"; // TODO: check if it's possible for hwmon to have a different id.
+        temperature = readFile(path);
+      }
+
+      const celsius = Math.round(parseInt(temperature) / 1000);
       let tempValue;
       let unitSymbol;
   
@@ -265,6 +279,7 @@ export class CPU {
   _updateSettings(settings) {
     this._position = settings.get_string('cpu-addon-position');
     this._tempUnit = settings.get_string('cpu-temperature-unit'); // Get unit from settings
+    this._gpuDevice = settings.get_string('gpu-device');
 
     // Recreate the widget with new settings
     this._stopMonitor();
@@ -320,7 +335,6 @@ export class CPU {
       this._addonContainer.destroy();
       this._addonContainer = null;
     }
-
 
     // Cleanup properties
     this._prevCpu = null;
