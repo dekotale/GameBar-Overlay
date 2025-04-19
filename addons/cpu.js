@@ -219,6 +219,7 @@ export class CPU {
     }
 
     _getGpuUsage() {
+      this._checkValidGpuDevice();
       const driver = getGpuDriver(this._gpuDevice);
       // TODO: Support more drivers.
       if (driver == "amdgpu") {
@@ -230,6 +231,7 @@ export class CPU {
     }
 
     _getGpuTemperature() {
+      this._checkValidGpuDevice();
       const driver = getGpuDriver(this._gpuDevice);
       let temperature;
 
@@ -251,6 +253,14 @@ export class CPU {
           unitSymbol = "°F";
       }
       return { temp: tempValue, unit: unitSymbol};
+    }
+
+    _checkValidGpuDevice() {
+        const gpus = listGpus().flat();
+
+        if (!gpus.includes(this._gpuDevice)) {
+            this._gpuDevice = gpus[0];
+        }
     }
 
   _updateMonitor() {
