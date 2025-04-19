@@ -22,6 +22,7 @@ export class CPU {
         this._cpuLabel = null;
         this._cpuTempLabel = null;
 
+        this._gpuMonitoring = null;
         this._gpuContainer = null;
         this._gpuUsageLabel = null;
         this._gpuLabel = null;
@@ -52,8 +53,6 @@ export class CPU {
           vertical: false
         });
 
-        // ------------- CPU
-
         // Create a container for CPU stats
         this._cpuContainer = new St.BoxLayout({
             vertical: true,
@@ -79,38 +78,41 @@ export class CPU {
         this._cpuContainer.add_child(this._cpuLabel);
         this._cpuContainer.add_child(this._cpuUsageLabel);
         this._cpuContainer.add_child(this._cpuTempLabel);
-
-        // -------------- GPU
-
-        // Create a container for GPU stats
-        this._gpuContainer = new St.BoxLayout({
-            vertical: true,
-            style_class: 'gamebar-cpu-container'
-        });
-
-        // Create the GPU title label
-        this._gpuLabel = new St.Label({
-            style_class: 'gamebar-cpu-label',
-            text: _('GPU')
-        });
-
-        // Create GPU usage label
-        this._gpuUsageLabel = new St.Label({
-            style_class: 'gamebar-cpu-usage',
-        });
-
-        // Create GPU temperature label (or GTop missing message)
-        this._gpuTempLabel = new St.Label({
-            style_class: 'gamebar-cpu-temp'
-        });
-
-        this._gpuContainer.add_child(this._gpuLabel);
-        this._gpuContainer.add_child(this._gpuUsageLabel);
-        this._gpuContainer.add_child(this._gpuTempLabel);
-
-        // Add the CPU container and the GPU container to the main container
+        
+        // Add the CPU container to the main container
         this._hwmonContainer.add_child(this._cpuContainer);
-        this._hwmonContainer.add_child(this._gpuContainer);
+
+        // Add GPU container if GPU monitoring is enabled.
+        if (this._gpuMonitoring) {
+            // Create a container for GPU stats
+            this._gpuContainer = new St.BoxLayout({
+              vertical: true,
+              style_class: 'gamebar-cpu-container'
+          });
+
+          // Create the GPU title label
+          this._gpuLabel = new St.Label({
+              style_class: 'gamebar-cpu-label',
+              text: _('GPU')
+          });
+
+          // Create GPU usage label
+          this._gpuUsageLabel = new St.Label({
+              style_class: 'gamebar-cpu-usage',
+          });
+
+          // Create GPU temperature label (or GTop missing message)
+          this._gpuTempLabel = new St.Label({
+              style_class: 'gamebar-cpu-temp'
+          });
+
+          this._gpuContainer.add_child(this._gpuLabel);
+          this._gpuContainer.add_child(this._gpuUsageLabel);
+          this._gpuContainer.add_child(this._gpuTempLabel);
+
+          // Add the GPU container to the main container
+          this._hwmonContainer.add_child(this._gpuContainer);
+        }
 
         // Add the main container to the addon container
         this._addonContainer.add_child(this._hwmonContainer);
@@ -269,9 +271,11 @@ export class CPU {
       this._cpuTempLabel.set_text(_("Temperature sensor not found"));
     }
 
-    this._gpuUsageLabel.set_text(this._getGpuUsage() + "%");
-    const gpuTemp = this._getGpuTemperature();
-    this._gpuTempLabel.set_text(gpuTemp.temp + gpuTemp.unit);
+    if (this._gpuMonitoring) {
+      this._gpuUsageLabel.set_text(this._getGpuUsage() + "%");
+      const gpuTemp = this._getGpuTemperature();
+      this._gpuTempLabel.set_text(gpuTemp.temp + gpuTemp.unit);
+    } 
 
     return true;
   }
@@ -280,6 +284,7 @@ export class CPU {
     this._position = settings.get_string('cpu-addon-position');
     this._tempUnit = settings.get_string('cpu-temperature-unit'); // Get unit from settings
     this._gpuDevice = settings.get_string('gpu-device');
+    this._gpuMonitoring = settings.get_boolean('gpu-monitoring');
 
     // Recreate the widget with new settings
     this._stopMonitor();

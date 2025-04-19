@@ -444,13 +444,23 @@ export default class Preferences extends ExtensionPreferences {
             settings.set_string('cpu-temperature-unit', selectedValue);
         });
     
-        // GPU selector
+        // GPU settings
         const gpuGroup = new Adw.PreferencesGroup({
             title: _('GPU Settings'),
             description: _('Configure the GPU addon'),
         });
         cpuPage.add(gpuGroup);
+        
+        // Toggle GPU monitoring
+        const gpuMonitoringRow = new Adw.SwitchRow({
+            title: _('GPU Monitoring'),
+            subtitle: _('Toggle GPU stats in the hardware monitor addon'),
+        });
 
+        gpuGroup.add(gpuMonitoringRow);
+        settings.bind('gpu-monitoring', gpuMonitoringRow, 'active', Gio.SettingsBindFlags.DEFAULT);
+
+        // GPU selector
         const gpuModel = new Gtk.StringList();
         const gpuList = listGpus();
         gpuList.forEach(([id]) => {
