@@ -70,7 +70,7 @@ const listDir = (path) => {
 };
 
 // Find the correct hwmon CPU temperature sensor if supportedf by the driver.
-const findHwmon = () => {
+const findCpuHwmon = () => {
     const drivers = ['zenpower', 'k10temp', 'coretemp'];
     let hwmonPath = null;
     try {
@@ -91,6 +91,14 @@ const findHwmon = () => {
     }
     return hwmonPath;
 };
+
+// Find the first hwmon for a GPU
+const findFirstHwmon = (drm_id) => {
+    const basePath = '/sys/class/drm/' + drm_id + "/device/hwmon"; // This directory can contain multiple hwmon interfaces.
+    const hwmonList = listDir(basePath);
+    const firstHwmon = hwmonList[0];
+    return basePath + "/" + firstHwmon.get_name();
+}
 
 // Get the GPU driver name (eg. amdgpu/nvidia/i915/xe)
 const getGpuDriver = (drm_id) => {
@@ -134,4 +142,4 @@ const celsiusToFahrenheit = (celsius) => {
     return (celsius * 9/5) + 32;
 };
 
-export { getPositionStyle, set_padding_setting, readFile, listDir, findHwmon, getGpuDriver, listGpus, celsiusToFahrenheit };
+export { getPositionStyle, set_padding_setting, readFile, listDir, findCpuHwmon, findFirstHwmon, getGpuDriver, listGpus, celsiusToFahrenheit };

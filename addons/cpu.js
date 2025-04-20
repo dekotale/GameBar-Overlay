@@ -1,7 +1,7 @@
 import St from 'gi://St';
 import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
-import { getPositionStyle, readFile, getGpuDriver, findHwmon, celsiusToFahrenheit } from '../utils.js';
+import { getPositionStyle, readFile, getGpuDriver, listGpus, findCpuHwmon, findFirstHwmon, celsiusToFahrenheit } from '../utils.js';
 
 // Import GTop conditionally
 let GTop = null;
@@ -43,7 +43,7 @@ export class CPU {
         if (this._gtopAvailable) {
             this._prevCpu = new GTop.default.glibtop_cpu();
         }
-        this._hwmonPath = findHwmon();
+        this._hwmonPath = findCpuHwmon();
 
         this._addonContainer = new St.Widget({
             layout_manager: new Clutter.BinLayout()
@@ -222,7 +222,7 @@ export class CPU {
       this._checkValidGpuDevice();
       const driver = getGpuDriver(this._gpuDevice);
       // TODO: Support more drivers.
-      if (driver == "amdgpu") {
+      if (driver == "amdgpu" || driver == "i915" || driver == "xe") {
         const usagePath = "/sys/class/drm/" + this._gpuDevice + "/device/gpu_busy_percent"
         const usage = readFile(usagePath);
         return usage;
@@ -236,8 +236,8 @@ export class CPU {
       let temperature;
 
       // TODO: Support more drivers.
-      if (driver == "amdgpu") {
-        const path = "/sys/class/drm/" + this._gpuDevice + "/device/hwmon/hwmon2/temp1_input"; // TODO: check if it's possible for hwmon to have a different id.
+      if (driver == "amdgpu" || driver == "i915" || driver == "xe") {
+        const path = findFirstHwmon(this._gpuDevice) + "/temp1_input";
         temperature = readFile(path);
       }
 
