@@ -230,6 +230,10 @@ export class CPU {
         const usagePath = "/sys/class/drm/" + this._gpuDevice + "/device/power/runtime_usage"
         const usage = readFile(usagePath);
         return usage;
+      }else if(driver == "nvidia"){
+        const output = GLib.spawn_command_line_sync("nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits")[1];
+        const usage = output.toString().trim();
+        return usage;
       }
       return "-"
     }
@@ -243,6 +247,9 @@ export class CPU {
       if (driver == "amdgpu" || driver == "i915" || driver == "xe" || driver == "nouveau") {
         const path = findFirstHwmon(this._gpuDevice) + "/temp1_input";
         temperature = readFile(path);
+      }else if(driver == "nvidia"){
+        const output = GLib.spawn_command_line_sync("nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits")[1];
+        temperature = output.toString().trim() * 1000;
       }
 
       const celsius = Math.round(parseInt(temperature) / 1000);
