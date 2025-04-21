@@ -226,6 +226,10 @@ export class CPU {
         const usagePath = "/sys/class/drm/" + this._gpuDevice + "/device/gpu_busy_percent"
         const usage = readFile(usagePath);
         return usage;
+      }else if(driver == "nouveau"){
+        const usagePath = "/sys/class/drm/" + this._gpuDevice + "/device/power/runtime_usage"
+        const usage = readFile(usagePath);
+        return usage;
       }
       return "-"
     }
@@ -236,7 +240,7 @@ export class CPU {
       let temperature;
 
       // TODO: Support more drivers.
-      if (driver == "amdgpu" || driver == "i915" || driver == "xe") {
+      if (driver == "amdgpu" || driver == "i915" || driver == "xe" || driver == "nouveau") {
         const path = findFirstHwmon(this._gpuDevice) + "/temp1_input";
         temperature = readFile(path);
       }

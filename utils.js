@@ -117,7 +117,7 @@ const getGpuDriver = (drm_id) => {
 
 // List all GPUs with supported drivers.
 const listGpus = () => {
-    const drivers = ['amdgpu', 'nvidia', 'i915', 'xe'];
+    const drivers = ['amdgpu', 'nvidia', 'i915', 'xe', 'nouveau'];
     const devices = [];
 
     const drmDevices = listDir('/sys/class/drm/');
