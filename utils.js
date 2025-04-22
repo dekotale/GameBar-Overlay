@@ -137,9 +137,36 @@ const listGpus = () => {
     return devices;
 }
 
+const getGpuModel = (drm_id) => {
+    const basePath = '/sys/class/drm/' + drm_id + "/device";
+    const expectedVendorId = readFile(basePath + "/vendor").replace("0x", "");
+    const expectedDeviceId = readFile(basePath + "/device").replace("0x", "");
+    const hwdata = readFile("/usr/share/hwdata/pci.ids");
+    
+    let foundVendor = false;
+    for (const line of hwdata.split("\n")) {
+        if (line.startsWith('#')) continue;
+
+        // Check if the vendor matches.
+        if (/^[0-9a-fA-F]{4}/.test(line)) {
+            const [vendorId] = line.trim().split(/\s+/);
+            foundVendor = (vendorId === expectedVendorId);
+        }
+
+        // If vendor matches, check next lines for matching device id.
+        else if (foundVendor && /^\t[0-9a-fA-F]{4}/.test(line)) {
+            const [deviceId, ...name] = line.trim().split(/\s+/);
+            if (deviceId.toLowerCase() === expectedDeviceId) {
+                return name.join(' ').match(/\[(.*?)\]/)?.[1]; // Extract only the model name from the full string.
+            }
+        }
+    }
+    return "Unknown GPU (found vendor: " + foundVendor + ")";
+}
+
 // Celsius to Fahrenheit conversion
 const celsiusToFahrenheit = (celsius) => {
     return (celsius * 9/5) + 32;
 };
 
-export { getPositionStyle, set_padding_setting, readFile, listDir, findCpuHwmon, findFirstHwmon, getGpuDriver, listGpus, celsiusToFahrenheit };
+export { getPositionStyle, set_padding_setting, readFile, listDir, findCpuHwmon, findFirstHwmon, getGpuDriver, listGpus, getGpuModel, celsiusToFahrenheit };
