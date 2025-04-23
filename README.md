@@ -25,7 +25,7 @@ Open the Overlay by clicking the top-bar button or by pressing `Super + G`
 - [x] Volume control
 - [x] Make configuration of the extension
 - [x] CPU usage and temperature addon
-- [ ] GPU usage and temperature addon
+- [x] GPU usage and temperature addon
 - [ ] Screenshot addon
 - [ ] Weather addon
 - [ ] Battery addon
