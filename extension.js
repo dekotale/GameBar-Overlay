@@ -15,7 +15,7 @@ import { set_padding_setting } from './utils.js';
 import {Clock} from './addons/clock.js';
 import {CloseButton} from './addons/closeButton.js';
 import {SoundControls} from './addons/soundControls.js';
-import {CPU} from './addons/cpu.js';
+import {SystemMonitor} from './addons/systemMonitor.js';
 //TODO:: screenshot addon
 //TODO:: weather addon
 //TODO:: battery addon
@@ -83,7 +83,7 @@ class GameBar extends PanelMenu.Button {
         this._clock = new Clock(this._overlay, primaryMonitor); // Clock addon
         this._closeButton = new CloseButton(this._overlay, primaryMonitor, this._toggleOverlay.bind(this)); // Close button addon
         this._soundControls = new SoundControls(this._overlay, primaryMonitor); // Sound controls addon
-        this._cpu = new CPU(this._overlay, primaryMonitor); // CPU stats addon
+        this._systemMonitor = new SystemMonitor(this._overlay, primaryMonitor); // System Monitor stats addon
 
         // Add the overlay widget to the global stage to affect the input region.
         global.stage.add_child(this._overlay);
@@ -333,7 +333,7 @@ class GameBar extends PanelMenu.Button {
         this._clock._updateSettings(settings);
         this._soundControls._updateSettings(settings);
         this._closeButton._updateSettings(settings);
-        this._cpu._updateSettings(settings);
+        this._systemMonitor._updateSettings(settings);
         set_padding_setting(settings.get_int('overlay-padding'));
         this._enterAnimation = settings.get_string('enter-animation');
         this._enterAnimationDuration = settings.get_int('enter-animation-duration');
@@ -361,8 +361,8 @@ class GameBar extends PanelMenu.Button {
         this._closeButton = null;
         this._soundControls?.destroy();
         this._soundControls = null;
-        this._cpu?.destroy();
-        this._cpu = null;
+        this._systemMonitor?.destroy();
+        this._systemMonitor = null;
 
         //Destroy overlay:
         this._overlay?.destroy();

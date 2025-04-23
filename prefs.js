@@ -5,6 +5,7 @@ import Gdk from 'gi://Gdk';
 import GLib from 'gi://GLib';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { listGpus, getGpuModel } from './utils.js';
 
 export default class Preferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -389,18 +390,18 @@ export default class Preferences extends ExtensionPreferences {
             settings.set_string('sound-icon-type', selectedValue);
         });
 
-        // CPU Addon Page
-        const cpuPage = new Adw.PreferencesPage({
-            title: _('CPU Addon'),
+        // System Monitor addon page
+        const monitorPage = new Adw.PreferencesPage({
+            title: _('System Monitor'),
             icon_name: 'computer-symbolic',
         });
-        window.add(cpuPage);
+        window.add(monitorPage);
 
         const cpuGroup = new Adw.PreferencesGroup({
-            title: _('CPU Settings'),
-            description: _('Configure the CPU addon'),
+            title: _('System Monitor Settings'),
+            description: _('Configure the System Monitor'),
         });
-        cpuPage.add(cpuGroup);
+        monitorPage.add(cpuGroup);
 
         // CPU addon position
         const cpuAddonPositionValues = [
@@ -411,7 +412,7 @@ export default class Preferences extends ExtensionPreferences {
  
         const cpuAddonPosition = new Adw.ComboRow({
             title: _('Position'),
-            subtitle: _('Position for the CPU stats in the overlay'),
+            subtitle: _('Position for the System Monitor in the overlay'),
             model: new Gtk.StringList({strings: cpuAddonPositionValues}),
         });
 
@@ -442,5 +443,45 @@ export default class Preferences extends ExtensionPreferences {
             const selectedValue = temperatureUnitRow.model.get_string(selectedIndex);
             settings.set_string('cpu-temperature-unit', selectedValue);
         });
+    
+        // GPU settings
+        const gpuGroup = new Adw.PreferencesGroup({
+            title: _('GPU Settings'),
+            description: _('Configure the GPU monitor'),
+        });
+        monitorPage.add(gpuGroup);
+        
+        // Toggle GPU monitoring
+        const gpuMonitoringRow = new Adw.SwitchRow({
+            title: _('GPU Monitoring'),
+            subtitle: _('Toggle GPU stats in the system monitor addon'),
+        });
+
+        gpuGroup.add(gpuMonitoringRow);
+        settings.bind('gpu-monitoring', gpuMonitoringRow, 'active', Gio.SettingsBindFlags.DEFAULT);
+
+        // GPU selector
+        const gpuModel = new Gtk.StringList();
+        const gpuList = listGpus();
+        gpuList.forEach(([id]) => {
+            gpuModel.append(getGpuModel(id));
+        });
+
+        const gpuRow = new Adw.ComboRow({
+            title: _('GPU'),
+            subtitle: _('Select which GPU to monitor'),
+            model: gpuModel,
+        });
+
+        const currentGpu = settings.get_string('gpu-device');
+        const index = gpuList.findIndex(([id]) => id === currentGpu);
+        gpuRow.set_selected(index >= 0 ? index : 0);
+
+        gpuRow.connect('notify::selected', () => {
+            const selectedIndex = gpuRow.selected;
+            const [selectedDevice] = gpuList[selectedIndex];
+            settings.set_string('gpu-device', selectedDevice);
+        });
+        gpuGroup.add(gpuRow);
     }
 }
