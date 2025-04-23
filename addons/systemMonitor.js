@@ -11,19 +11,21 @@ try {
     // GTop is not available, it is already null
 }
 
-export class CPU {
+export class SystemMonitor {
     constructor(overlay, primaryMonitor) {
         this._overlay = overlay;
         this._primaryMonitor = primaryMonitor;
         this._widthChangeId = null;
         this._heightChangeId = null;
+        
         this._cpuContainer = null;
         this._cpuUsageLabel = null;
         this._cpuLabel = null;
         this._cpuTempLabel = null;
+        this._cpuHwmonPath = null;
 
-        this._gpuMonitoring = null;
         this._gpuContainer = null;
+        this._gpuMonitoring = null;
         this._gpuUsageLabel = null;
         this._gpuLabel = null;
         this._gpuTempLabel = null;
@@ -31,48 +33,48 @@ export class CPU {
         
         this._timeoutId = null;
         this._addonContainer = null;
+        this._systemMonitorContainer = null;
         this._visibilityChangedId = null;
-        this._hwmonPath = null;
         this._prevCpu = null;
         this._gtopAvailable = GTop !== null;
         this._tempUnit = 'C'; // Default to Celsius
-        this._createCPUWidget();
+        this._createMonitorWidget();
     }
 
-    _createCPUWidget() {
+    _createMonitorWidget() {
         if (this._gtopAvailable) {
             this._prevCpu = new GTop.default.glibtop_cpu();
         }
-        this._hwmonPath = findCpuHwmon();
+        this._cpuHwmonPath = findCpuHwmon();
 
         this._addonContainer = new St.Widget({
             layout_manager: new Clutter.BinLayout()
         });
 
-        this._hwmonContainer = new St.BoxLayout({
+        this._systemMonitorContainer = new St.BoxLayout({
           vertical: false
         });
 
         // Create a container for CPU stats
         this._cpuContainer = new St.BoxLayout({
             vertical: true,
-            style_class: 'gamebar-cpu-container'
+            style_class: 'gamebar-monitor-container'
         });
 
         // Create the CPU title label
         this._cpuLabel = new St.Label({
-            style_class: 'gamebar-cpu-label',
+            style_class: 'gamebar-monitor-label',
             text: _('CPU')
         });
 
         // Create CPU usage label
         this._cpuUsageLabel = new St.Label({
-            style_class: 'gamebar-cpu-usage',
+            style_class: 'gamebar-monitor-usage',
         });
 
         // Create CPU temperature label (or GTop missing message)
         this._cpuTempLabel = new St.Label({
-            style_class: 'gamebar-cpu-temp'
+            style_class: 'gamebar-monitor-temp'
         });
 
         this._cpuContainer.add_child(this._cpuLabel);
@@ -80,30 +82,30 @@ export class CPU {
         this._cpuContainer.add_child(this._cpuTempLabel);
         
         // Add the CPU container to the main container
-        this._hwmonContainer.add_child(this._cpuContainer);
+        this._systemMonitorContainer.add_child(this._cpuContainer);
 
         // Add GPU container if GPU monitoring is enabled.
         if (this._gpuMonitoring) {
             // Create a container for GPU stats
             this._gpuContainer = new St.BoxLayout({
               vertical: true,
-              style_class: 'gamebar-cpu-container'
+              style_class: 'gamebar-monitor-container'
           });
 
           // Create the GPU title label
           this._gpuLabel = new St.Label({
-              style_class: 'gamebar-cpu-label',
+              style_class: 'gamebar-monitor-label',
               text: _('GPU')
           });
 
           // Create GPU usage label
           this._gpuUsageLabel = new St.Label({
-              style_class: 'gamebar-cpu-usage',
+              style_class: 'gamebar-monitor-usage',
           });
 
           // Create GPU temperature label (or GTop missing message)
           this._gpuTempLabel = new St.Label({
-              style_class: 'gamebar-cpu-temp'
+              style_class: 'gamebar-monitor-temp'
           });
 
           this._gpuContainer.add_child(this._gpuLabel);
@@ -111,11 +113,11 @@ export class CPU {
           this._gpuContainer.add_child(this._gpuTempLabel);
 
           // Add the GPU container to the main container
-          this._hwmonContainer.add_child(this._gpuContainer);
+          this._systemMonitorContainer.add_child(this._gpuContainer);
         }
 
         // Add the main container to the addon container
-        this._addonContainer.add_child(this._hwmonContainer);
+        this._addonContainer.add_child(this._systemMonitorContainer);
 
         // Add the addon container to the overlay
         this._overlay.add_child(this._addonContainer);
@@ -195,11 +197,11 @@ export class CPU {
   }
 
   _getCpuTemperature() {
-    if (!this._hwmonPath) {
+    if (!this._cpuHwmonPath) {
       return { temp: _("N/A"), unit: "" };
     }
 
-    const temperature = readFile(this._hwmonPath);
+    const temperature = readFile(this._cpuHwmonPath);
     if (temperature === null) {
       return { temp: _("Error"), unit: "" };
     }
@@ -221,7 +223,6 @@ export class CPU {
     _getGpuUsage() {
       this._checkValidGpuDevice();
       const driver = getGpuDriver(this._gpuDevice);
-      // TODO: Support more drivers.
       if (driver == "amdgpu" || driver == "i915" || driver == "xe") {
         const usagePath = "/sys/class/drm/" + this._gpuDevice + "/device/gpu_busy_percent"
         const usage = readFile(usagePath);
@@ -243,7 +244,6 @@ export class CPU {
       const driver = getGpuDriver(this._gpuDevice);
       let temperature;
 
-      // TODO: Support more drivers.
       if (driver == "amdgpu" || driver == "i915" || driver == "xe" || driver == "nouveau") {
         const path = findFirstHwmon(this._gpuDevice) + "/temp1_input";
         temperature = readFile(path);
@@ -266,6 +266,7 @@ export class CPU {
       return { temp: tempValue, unit: unitSymbol};
     }
 
+    // Fallback to the first available GPU if the selected one does not exist
     _checkValidGpuDevice() {
         const gpus = listGpus().flat();
 
@@ -283,12 +284,12 @@ export class CPU {
     this._cpuUsageLabel.set_text(this._getCpuUsage() + "%");
     const temp = this._getCpuTemperature();
 
-    if (this._gtopAvailable && this._hwmonPath) {
+    if (this._gtopAvailable && this._cpuHwmonPath) {
       this._cpuTempLabel.set_text(temp.temp + temp.unit);
     } else if (!this._gtopAvailable) {
       this._cpuTempLabel.set_text(_("GTop missing, install 'libgtop' for temperature"));
       this._cpuUsageLabel.set_text(""); //Dont show anything here when GTop is not available
-    } else if (!this._hwmonPath) {
+    } else if (!this._cpuHwmonPath) {
       this._cpuTempLabel.set_text(_("Temperature sensor not found"));
     }
 
@@ -310,7 +311,7 @@ export class CPU {
     // Recreate the widget with new settings
     this._stopMonitor();
     this.destroy();
-    this._createCPUWidget();
+    this._createMonitorWidget();
   }
 
   destroy() {
@@ -364,7 +365,7 @@ export class CPU {
 
     // Cleanup properties
     this._prevCpu = null;
-    this._hwmonPath = null;
+    this._cpuHwmonPath = null;
   }
 }
 

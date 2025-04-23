@@ -137,6 +137,7 @@ const listGpus = () => {
     return devices;
 }
 
+// Searches for the device string in the hwdata database.
 const getGpuModel = (drm_id) => {
     const basePath = '/sys/class/drm/' + drm_id + "/device";
     const expectedVendorId = readFile(basePath + "/vendor").replace("0x", "");
@@ -161,7 +162,7 @@ const getGpuModel = (drm_id) => {
             }
         }
     }
-    return "Unknown GPU (found vendor: " + foundVendor + ")";
+    return "Unknown (" + getGpuDriver(drm_id) + ")";
 }
 
 // Celsius to Fahrenheit conversion

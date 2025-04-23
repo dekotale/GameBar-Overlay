@@ -27,14 +27,14 @@
 
     <key name="cpu-addon-position" type="s">
       <default>'Bottom Left'</default>
-      <summary>Position for the CPU stats in the overlay</summary>
-      <description>Set the position for the CPU stats in the overlay</description>
+      <summary>Position for the System Monitor in the overlay</summary>
+      <description>Set the position for the System Monitor in the overlay</description>
     </key>
 
     <key name="cpu-temperature-unit" type="s">
         <default>'C'</default>
-        <summary>CPU temperature unit</summary>
-        <description>Select the temperature unit for the CPU addon (C for Celsius, F for Fahrenheit)</description>
+        <summary>System Monitor temperature unit</summary>
+        <description>Select the temperature unit for the System Monitor addon (C for Celsius, F for Fahrenheit)</description>
     </key>
 
     <key name="gpu-monitoring" type="b">

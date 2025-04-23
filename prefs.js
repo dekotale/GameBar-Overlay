@@ -390,18 +390,18 @@ export default class Preferences extends ExtensionPreferences {
             settings.set_string('sound-icon-type', selectedValue);
         });
 
-        // CPU Addon Page
-        const cpuPage = new Adw.PreferencesPage({
-            title: _('CPU Addon'),
+        // System Monitor addon page
+        const monitorPage = new Adw.PreferencesPage({
+            title: _('System Monitor'),
             icon_name: 'computer-symbolic',
         });
-        window.add(cpuPage);
+        window.add(monitorPage);
 
         const cpuGroup = new Adw.PreferencesGroup({
             title: _('CPU Settings'),
-            description: _('Configure the CPU addon'),
+            description: _('Configure the CPU monitor'),
         });
-        cpuPage.add(cpuGroup);
+        monitorPage.add(cpuGroup);
 
         // CPU addon position
         const cpuAddonPositionValues = [
@@ -412,7 +412,7 @@ export default class Preferences extends ExtensionPreferences {
  
         const cpuAddonPosition = new Adw.ComboRow({
             title: _('Position'),
-            subtitle: _('Position for the CPU stats in the overlay'),
+            subtitle: _('Position for the CPU monitor in the overlay'),
             model: new Gtk.StringList({strings: cpuAddonPositionValues}),
         });
 
@@ -447,14 +447,14 @@ export default class Preferences extends ExtensionPreferences {
         // GPU settings
         const gpuGroup = new Adw.PreferencesGroup({
             title: _('GPU Settings'),
-            description: _('Configure the GPU addon'),
+            description: _('Configure the GPU monitor'),
         });
-        cpuPage.add(gpuGroup);
+        monitorPage.add(gpuGroup);
         
         // Toggle GPU monitoring
         const gpuMonitoringRow = new Adw.SwitchRow({
             title: _('GPU Monitoring'),
-            subtitle: _('Toggle GPU stats in the hardware monitor addon'),
+            subtitle: _('Toggle GPU stats in the system monitor addon'),
         });
 
         gpuGroup.add(gpuMonitoringRow);

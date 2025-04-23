@@ -64,8 +64,8 @@
     width: 300px;
 }
 
-/*CPU addon styles*/
-.gamebar-cpu-container {
+/*System Monitor addon styles*/
+.gamebar-monitor-container {
     height: auto; 
     background-color: rgba(255, 255, 255, 0.2); 
     border-radius: 15px; 
@@ -73,21 +73,21 @@
     margin-right: 20px;
 }
 
-.gamebar-cpu-label {
+.gamebar-monitor-label {
     color: white; 
     font-size: 38px;
     font-weight: lighter;
     text-align: left;
 }
 
-.gamebar-cpu-usage {
+.gamebar-monitor-usage {
     color: white;
     font-size: 28px;
     font-weight: bold;
     text-align: right;
 }
 
-.gamebar-cpu-temp {
+.gamebar-monitor-temp {
     color: white;
     font-size: 16px;
     font-weight: lighter;
