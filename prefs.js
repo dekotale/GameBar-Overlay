@@ -398,8 +398,8 @@ export default class Preferences extends ExtensionPreferences {
         window.add(monitorPage);
 
         const cpuGroup = new Adw.PreferencesGroup({
-            title: _('CPU Settings'),
-            description: _('Configure the CPU monitor'),
+            title: _('System Monitor Settings'),
+            description: _('Configure the System Monitor'),
         });
         monitorPage.add(cpuGroup);
 
@@ -412,7 +412,7 @@ export default class Preferences extends ExtensionPreferences {
  
         const cpuAddonPosition = new Adw.ComboRow({
             title: _('Position'),
-            subtitle: _('Position for the CPU monitor in the overlay'),
+            subtitle: _('Position for the System Monitor in the overlay'),
             model: new Gtk.StringList({strings: cpuAddonPositionValues}),
         });
 
