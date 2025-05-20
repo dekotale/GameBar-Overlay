@@ -14,8 +14,7 @@
     border-radius: 15px; 
     padding: 5px 20px;
     font-weight: 500;
-    /**TODO:: Fix The width of the clock addon's container slightly 
-    changes size when the text displaying the time changes.**/
+    font-feature-settings: "tnum";
 }
 
 /*Close button styles*/
