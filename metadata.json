@@ -6,9 +6,10 @@
   "shell-version": [
     "46",
     "47",
-    "48"
+    "48",
+    "49"
   ],
   "url": "https://github.com/dekotale/GameBar-Overlay",
   "uuid": "gamebar-overlay@dekotale.github.io",
-  "version": 12
+  "version": 13
 }
