@@ -15,6 +15,12 @@ A fullscreen overlay widget for GNOME that displays useful information, audio co
 
 Just clone the repo into `~/.local/share/gnome-shell/extensions/gamebar-overlay@dekotale.github.io` and enable the extension via GNOME Extensions app or similar.
 
+## Dependencies
+Installing these packages is optional, but they will provide additional functionality to this extension.  
+
+- `libgtop` - required for the System Monitor addon.
+- `hwdata` - needed to read your hardware model.
+
 ## Usage
 
 Open the Overlay by clicking the top-bar button or by pressing `Super + G`
