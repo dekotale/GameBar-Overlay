@@ -19,7 +19,7 @@ Just clone the repo into `~/.local/share/gnome-shell/extensions/gamebar-overlay@
 Installing these packages is optional, but they will provide additional functionality to this extension.  
 
 - `libgtop` - required for the System Monitor addon.
-- `hwdata` - needed to read your hardware model.
+- `hwdata` - needed to read your GPU name.
 
 ## Usage
 
