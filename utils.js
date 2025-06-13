@@ -143,6 +143,11 @@ const getGpuModel = (drm_id) => {
     const expectedVendorId = readFile(basePath + "/vendor").replace("0x", "");
     const expectedDeviceId = readFile(basePath + "/device").replace("0x", "");
     const hwdata = readFile("/usr/share/hwdata/pci.ids");
+
+    // Some distributions (for example Debian) don't install hwdata by default.
+    if (hwdata === null) {
+        return "Unknown (" + getGpuDriver(drm_id) + ")";
+    }
     
     let foundVendor = false;
     for (const line of hwdata.split("\n")) {
