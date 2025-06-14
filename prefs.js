@@ -5,7 +5,7 @@ import Gdk from 'gi://Gdk';
 import GLib from 'gi://GLib';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-import { listGpus, getGpuModel } from './utils.js';
+import { listGpus, getGpuModel, readFile } from './utils.js';
 
 export default class Preferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -483,5 +483,19 @@ export default class Preferences extends ExtensionPreferences {
             settings.set_string('gpu-device', selectedDevice);
         });
         gpuGroup.add(gpuRow);
+
+        // Display a warning if hwdata is missing.
+        if (readFile("/usr/share/hwdata/pci.ids") === null) {
+            const hwdataRow = new Adw.ActionRow({
+                title: _("'hwdata' not installed: can't get GPU name!")
+            });
+
+            const box = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 10 });
+            const icon = new Gtk.Image({ iconName: "dialog-warning-symbolic" });
+            icon.set_margin_end(10);
+            box.append(icon);
+            hwdataRow.add_prefix(box)
+            gpuGroup.add(hwdataRow);
+        }
     }
 }
