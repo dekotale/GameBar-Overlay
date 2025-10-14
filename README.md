@@ -9,7 +9,7 @@ A fullscreen overlay widget for GNOME that displays useful information, audio co
 
 - Fullscreen overlay for quick access to essential information
 - Audio controls integration
-- CPU usage and temperature monitor
+- CPU/GPU usage and temperature monitor
 
 ## Installation
 
