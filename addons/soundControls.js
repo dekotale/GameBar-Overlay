@@ -328,18 +328,6 @@ export class SoundControls {
     }
 
     destroy() {
-        if (this._appVolumesContainer && this._appVolumesContainer.get_parent() === this._overlay) {
-          this._overlay.remove_child(this._appVolumesContainer);
-        }
-
-        if (this._addonContainer && this._addonContainer.get_parent() === this._overlay) {
-            this._overlay.remove_child(this._addonContainer);
-        }
-      
-        if (this._appVolumesBox && this._appVolumesBox.get_parent() === this._overlay) {
-          this._overlay.remove_child(this._appVolumesBox);
-        }
-
         //Disconnects the signals
         if(this._heightChangeId){
             this._addonContainer.disconnect(this._heightChangeId);
@@ -363,17 +351,17 @@ export class SoundControls {
             this._SliderNotifyId = null;
         }
 
-        this._volumeSlider?.destroy();
+        if (this._addonContainer) {
+            this._addonContainer.destroy();
+            this._addonContainer = null;
+        }
+
         this._volumeSlider = null;
-        this._volumeIcon?.destroy();
         this._volumeIcon = null;
         this._volumePanel = null;
-        this._appVolumesBox?.destroy();
         this._appVolumesBox = null;
         this._stream = null;
         this._volumeControl = null;
-        this._appVolumesContainer?.destroy();
         this._appVolumesContainer = null;
-        this._addonContainer = null;
-      }
+    }
 }

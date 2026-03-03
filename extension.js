@@ -444,17 +444,13 @@ export default class GameBarExtension extends Extension {
 
         // Set the extension settings to null
         if (this._keybindId) {
-            Main.layoutManager.disconnect(this._keybindId);
+            this._settings.disconnect(this._keybindId);
             this._keybindId = null;
         }
 
         if (this._settingsChangedId) {
             this._settings.disconnect(this._settingsChangedId);
             this._settingsChangedId = null;
-        }
-
-        if (this._settings){
-            this._settings.disconnect('changed::overlay-background-color');
         }
 
         this._settings = null;

@@ -222,6 +222,7 @@ export class SystemMonitor {
 
     _getGpuUsage() {
       this._checkValidGpuDevice();
+      if (!this._gpuDevice) return "-";
       const driver = getGpuDriver(this._gpuDevice);
       if (driver == "amdgpu" || driver == "i915" || driver == "xe") {
         const usagePath = "/sys/class/drm/" + this._gpuDevice + "/device/gpu_busy_percent"
@@ -241,6 +242,7 @@ export class SystemMonitor {
 
     _getGpuTemperature() {
       this._checkValidGpuDevice();
+      if (!this._gpuDevice) return { temp: _("N/A"), unit: "" };
       const driver = getGpuDriver(this._gpuDevice);
       let temperature;
 
@@ -270,6 +272,11 @@ export class SystemMonitor {
     _checkValidGpuDevice() {
         const gpus = listGpus().flat();
 
+        if (gpus.length === 0) {
+            this._gpuDevice = null;
+            return;
+        }
+
         if (!gpus.includes(this._gpuDevice)) {
             this._gpuDevice = gpus[0];
         }
@@ -294,9 +301,10 @@ export class SystemMonitor {
     }
 
     if (this._gpuMonitoring) {
-      this._gpuUsageLabel.set_text(this._getGpuUsage() + "%");
-      const gpuTemp = this._getGpuTemperature();
-      this._gpuTempLabel.set_text(gpuTemp.temp + gpuTemp.unit);
+        const gpuUsage = this._getGpuUsage();
+        this._gpuUsageLabel.set_text(gpuUsage + (gpuUsage !== "-" ? "%" : ""));
+        const gpuTemp = this._getGpuTemperature();
+        this._gpuTempLabel.set_text(gpuTemp.temp + gpuTemp.unit);
     } 
 
     return true;
@@ -314,6 +322,7 @@ export class SystemMonitor {
     this._createMonitorWidget();
   }
 
+  
   destroy() {
     // Stop the monitor
     this._stopMonitor();
@@ -334,36 +343,24 @@ export class SystemMonitor {
       this._visibilityChangedId = null;
     }
 
-    // Destroy childrens and remove them from their parent
-    if (this._cpuUsageLabel) {
-        this._cpuContainer.remove_child(this._cpuUsageLabel);
-        this._cpuUsageLabel.destroy();
-        this._cpuUsageLabel = null;
-    }
-    if (this._cpuLabel) {
-        this._cpuContainer.remove_child(this._cpuLabel);
-        this._cpuLabel.destroy();
-        this._cpuLabel = null;
-    }
-    if (this._cpuTempLabel) {
-        this._cpuContainer.remove_child(this._cpuTempLabel);
-        this._cpuTempLabel.destroy();
-        this._cpuTempLabel = null;
-    }
-    if (this._cpuContainer) {
-      this._addonContainer.remove_child(this._cpuContainer)
-      this._cpuContainer.destroy();
-      this._cpuContainer = null
-    }
-
     // Destroy the addon container and remove it from the overlay.
-    if (this._addonContainer && this._addonContainer.get_parent()) {
-      this._overlay.remove_child(this._addonContainer);
+    if (this._addonContainer) {
       this._addonContainer.destroy();
       this._addonContainer = null;
     }
 
     // Cleanup properties
+    this._cpuContainer = null;
+    this._cpuUsageLabel = null;
+    this._cpuLabel = null;
+    this._cpuTempLabel = null;
+    
+    this._gpuContainer = null;
+    this._gpuUsageLabel = null;
+    this._gpuLabel = null;
+    this._gpuTempLabel = null;
+    
+    this._systemMonitorContainer = null;
     this._prevCpu = null;
     this._cpuHwmonPath = null;
   }
