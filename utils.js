@@ -103,16 +103,20 @@ const findFirstHwmon = (drm_id) => {
 // Get the GPU driver name (eg. amdgpu/nvidia/i915/xe)
 const getGpuDriver = (drm_id) => {
     // /sys/class/drm/card*/device/driver is a symlink to the kernel module and needs to be resolved.
-    const path = '/sys/class/drm/' + drm_id + "/device/driver";
-    const driverPath = Gio.File.new_for_path(path);
-    const driverPathInfo = driverPath.query_info(
-        'standard::symlink-target',
-        Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
-        null
-    );
+    try {
+        const path = '/sys/class/drm/' + drm_id + "/device/driver";
+        const driverPath = Gio.File.new_for_path(path);
+        const driverPathInfo = driverPath.query_info(
+            'standard::symlink-target',
+            Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS,
+            null
+        );
 
-    const driverName = driverPathInfo.get_symlink_target().split('/').pop();
-    return driverName;
+        const driverName = driverPathInfo.get_symlink_target().split('/').pop();
+        return driverName;
+    } catch (e) {
+        return null;
+    }
 }
 
 // List all GPUs with supported drivers.

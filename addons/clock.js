@@ -144,14 +144,12 @@ export class Clock {
     }
 
     // Remove the clock widget from the overlay
-    if (this._timeLabel && this._timeLabel.get_parent()) {
-      this._overlay.remove_child(this._timeLabel.get_parent());
+    if (this._addonContainer) {
+      this._addonContainer.destroy();
+      this._addonContainer = null;
     }
 
     // Cleanup
-    this._timeLabel?.destroy();
     this._timeLabel = null;
-    this._addonContainer?.destroy();
-    this._addonContainer = null;
   }
 }
