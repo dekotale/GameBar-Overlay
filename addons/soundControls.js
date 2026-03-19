@@ -19,6 +19,9 @@ export class SoundControls {
         this._addonContainer = null;
         //Listeners:
         this._widthChangeId = null;
+        this._streamVolumeChangeId = null;
+        this._streamMutedChangeId = null;
+        this._isSyncingUI = false;
         this._heightChangeId = null;
         this._VolumeSliderNotifyId = null;
         this._VolumeIconCLickedId = null;
@@ -107,13 +110,17 @@ export class SoundControls {
 
     // Update all volume controls
     updateVolumeControls() {
+        this._disconnectMainStreamSignals();
+
         // Get the default audio sink (main volume)
         this._stream = this._volumeControl.get_default_sink();
 
         if (this._stream) {
-            // Update the main volume slider
-            this._volumeSlider.value = this._stream.volume / this._volumeControl.get_vol_max_norm();
-            this._updateVolumeIcon(this._stream.is_muted);
+            //Syncs actual state
+            this._syncUIFromStream();
+
+            this._streamVolumeChangeId = this._stream.connect('notify::volume', this._syncUIFromStream.bind(this));
+            this._streamMutedChangeId = this._stream.connect('notify::is-muted', this._syncUIFromStream.bind(this));
         }
 
         // Clear existing app volume controls
@@ -262,10 +269,28 @@ export class SoundControls {
         // Create a volume slider for the app
         let slider = new Slider(stream.volume / this._volumeControl.get_vol_max_norm());
         slider.set_style('width: 300px;'); //TODO:: make configurable
+
+        let isSyncing = false;
+
         slider.connect('notify::value', () => {
-            stream.volume = slider.value * this._volumeControl.get_vol_max_norm();
-            stream.push_volume();
+            if (!isSyncing) {
+                stream.volume = slider.value * this._volumeControl.get_vol_max_norm();
+                stream.push_volume();
+            }
         });
+
+        let streamVolId = stream.connect('notify::volume', () => {
+            isSyncing = true;
+            slider.value = stream.volume / this._volumeControl.get_vol_max_norm();
+            isSyncing = false;
+        });
+
+        container.connect('destroy', () => {
+            if (streamVolId) {
+                stream.disconnect(streamVolId);
+            }
+        });
+
     
         // Add all elements to the container
         container.add_child(APPicon);
@@ -277,7 +302,7 @@ export class SoundControls {
 
     // Handle changes to the main volume slider
     _onVolumeChanged() {
-        if (this._stream) {
+        if (this._stream && !this._isSyncingUI) {
             let volume = this._volumeSlider.value * this._volumeControl.get_vol_max_norm();
             this._stream.volume = volume;
             this._stream.push_volume();
@@ -315,6 +340,30 @@ export class SoundControls {
         this._volumeIcon.child.icon_name = iconName;
     }
 
+    _disconnectMainStreamSignals() {
+        if (this._stream) {
+            if (this._streamVolumeChangeId) {
+                this._stream.disconnect(this._streamVolumeChangeId);
+                this._streamVolumeChangeId = null;
+            }
+            if (this._streamMutedChangeId) {
+                this._stream.disconnect(this._streamMutedChangeId);
+                this._streamMutedChangeId = null;
+            }
+        }
+    }
+
+    _syncUIFromStream() {
+        if (!this._stream) return;
+
+        this._isSyncingUI = true;
+
+        this._volumeSlider.value = this._stream.volume / this._volumeControl.get_vol_max_norm();
+        this._updateVolumeIcon(this._stream.is_muted);
+
+        this._isSyncingUI = false;
+    }
+
     _updateSettings(settings) {
         this._icon_Size = settings.get_int('sound-controls-icon-size');
         this._showAppDesc = settings.get_boolean('sound-controls-show-app-description');
@@ -328,6 +377,8 @@ export class SoundControls {
 
     destroy() {
         //Disconnects the signals
+        this._disconnectMainStreamSignals();
+
         if(this._heightChangeId){
             this._addonContainer.disconnect(this._heightChangeId);
             this._heightChangeId = null;
