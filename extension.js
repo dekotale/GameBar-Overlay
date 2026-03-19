@@ -132,11 +132,6 @@ class GameBar extends PanelMenu.Button {
             this.defaultOverlayKeyID = null;
         }
 
-        if (this._overlayKeyId) {
-            global.display.disconnect(this._overlayKeyId);
-            this._overlayKeyId = null;
-        }
-        
         Main.wm.allowKeybinding('overlay-key', Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW);
     }
 

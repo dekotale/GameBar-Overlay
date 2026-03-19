@@ -22,7 +22,6 @@ export class SoundControls {
         this._heightChangeId = null;
         this._VolumeSliderNotifyId = null;
         this._VolumeIconCLickedId = null;
-        this._SliderNotifyId = null;
     }
 
     // Create the main volume controls
@@ -263,7 +262,7 @@ export class SoundControls {
         // Create a volume slider for the app
         let slider = new Slider(stream.volume / this._volumeControl.get_vol_max_norm());
         slider.set_style('width: 300px;'); //TODO:: make configurable
-        this._SliderNotifyId = slider.connect('notify::value', () => {
+        slider.connect('notify::value', () => {
             stream.volume = slider.value * this._volumeControl.get_vol_max_norm();
             stream.push_volume();
         });
@@ -346,9 +345,6 @@ export class SoundControls {
         if(this._VolumeIconCLickedId){
             this._volumeIcon.disconnect(this._VolumeIconCLickedId);
             this._VolumeIconCLickedId = null;
-        }
-        if(this._SliderNotifyId){
-            this._SliderNotifyId = null;
         }
 
         if (this._addonContainer) {

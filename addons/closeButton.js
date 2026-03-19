@@ -12,6 +12,7 @@ export class CloseButton {
         this._addonContainer = null;
         this._widthChangeId = null;
         this._heightChangeId = null;
+        this._buttonReleaseId = null;
         this._createCloseButton();
     }
 
@@ -41,7 +42,7 @@ export class CloseButton {
         this._overlay.add_child(this._addonContainer);
 
         // Add an event listener to close the overlay when clicking on an empty space
-        this._overlay.connect('button-release-event', (actor, event) => {
+        this._buttonReleaseId = this._overlay.connect('button-release-event', (actor, event) => {
           if (this._emptyAreaClose) {
             // Check if the overlay itself was clicked
             if (this._overlay.visible && actor === this._overlay) {
@@ -79,6 +80,11 @@ export class CloseButton {
 
     destroy() {
         //Disconnects the signals
+        if (this._buttonReleaseId) {
+            this._overlay.disconnect(this._buttonReleaseId);
+            this._buttonReleaseId = null;
+        }
+
         if(this._heightChangeId){
             this._addonContainer.disconnect(this._heightChangeId);
             this._heightChangeId = null;
