@@ -45,6 +45,9 @@ class GameBar extends PanelMenu.Button {
         });
         this.add_child(this._icon);
 
+        this._monitorsChangedId = null;
+        this._keyPressId = null;
+
         // Call the _createOverlay method to create the overlay widget and addons
         this._createOverlay();
 
@@ -95,7 +98,7 @@ class GameBar extends PanelMenu.Button {
         });
 
         // Connect to 'key-press-event' signal to close the overlay when ESC key is clicked
-        this._overlay.connect('key-press-event', (actor, event) => {
+        this._keyPressId = this._overlay.connect('key-press-event', (actor, event) => {
             if (this._overlay.visible && event.get_key_symbol() === Clutter.KEY_Escape) {
                 this._toggleOverlay(); 
             }
@@ -359,6 +362,12 @@ class GameBar extends PanelMenu.Button {
         this._systemMonitor?.destroy();
         this._systemMonitor = null;
 
+        //Destroy the signals:
+        if (this._keyPressId) {
+            this._overlay?.disconnect(this._keyPressId);
+            this._keyPressId = null;
+        }
+
         //Destroy overlay:
         this._overlay?.destroy();
         this._overlay = null;
@@ -368,7 +377,6 @@ class GameBar extends PanelMenu.Button {
         this._icon = null;
         this._settings = null;
 
-        //Destroy the signals:
         if (this._monitorsChangedId) {
             Main.layoutManager.disconnect(this._monitorsChangedId);
             this._monitorsChangedId = null;
