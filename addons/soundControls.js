@@ -37,7 +37,7 @@ export class SoundControls {
 
         // Create a container for all volume controls
         this._appVolumesContainer = new St.BoxLayout({
-            vertical: true,
+            orientation: Clutter.Orientation.VERTICAL,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.START,
             style_class: 'gamebar-volume-container-global'
@@ -45,7 +45,7 @@ export class SoundControls {
 
         // Create the main volume panel
         let volumePanel = new St.BoxLayout({
-            vertical: false,
+            orientation: Clutter.Orientation.HORIZONTAL,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.CENTER
         });
@@ -73,7 +73,7 @@ export class SoundControls {
 
         // Create a box for app-specific volume controls
         this._appVolumesBox = new St.BoxLayout({
-            vertical: true,
+            orientation: Clutter.Orientation.VERTICAL,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.START,
         });
@@ -137,7 +137,7 @@ export class SoundControls {
         
             // Create a box for label and volumeBox
             let labelBox = new St.BoxLayout({
-                vertical: true,
+                orientation: Clutter.Orientation.VERTICAL,
                 x_align: Clutter.ActorAlign.START,
                 y_align: Clutter.ActorAlign.START
             });
@@ -252,7 +252,7 @@ export class SoundControls {
     _createAppVolumeControl(stream) {
         let container = new St.BoxLayout({
             style_class: 'gamebar-app-volume-control',
-            vertical: false,
+            orientation: Clutter.Orientation.HORIZONTAL,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.CENTER
         });

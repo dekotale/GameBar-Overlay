@@ -52,12 +52,12 @@ export class SystemMonitor {
         });
 
         this._systemMonitorContainer = new St.BoxLayout({
-          vertical: false
+          orientation: Clutter.Orientation.HORIZONTAL
         });
 
         // Create a container for CPU stats
         this._cpuContainer = new St.BoxLayout({
-            vertical: true,
+            orientation: Clutter.Orientation.VERTICAL,
             style_class: 'gamebar-monitor-container'
         });
 
@@ -88,7 +88,7 @@ export class SystemMonitor {
         if (this._gpuMonitoring) {
             // Create a container for GPU stats
             this._gpuContainer = new St.BoxLayout({
-              vertical: true,
+              orientation: Clutter.Orientation.VERTICAL,
               style_class: 'gamebar-monitor-container'
           });
 
@@ -365,4 +365,3 @@ export class SystemMonitor {
     this._cpuHwmonPath = null;
   }
 }
-
