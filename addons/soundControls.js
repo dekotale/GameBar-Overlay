@@ -6,6 +6,14 @@ import Gio from 'gi://Gio';
 import { getPositionStyle } from '../utils.js';
 import GLib from 'gi://GLib';
 
+const VERTICAL = 'orientation' in St.BoxLayout.prototype
+    ? { orientation: Clutter.Orientation.VERTICAL }
+    : { vertical: true };
+
+const HORIZONTAL = 'orientation' in St.BoxLayout.prototype
+    ? { orientation: Clutter.Orientation.HORIZONTAL }
+    : { vertical: false };
+
 export class SoundControls {
     constructor(overlay, primaryMonitor) {
         this._overlay = overlay;
@@ -37,7 +45,7 @@ export class SoundControls {
 
         // Create a container for all volume controls
         this._appVolumesContainer = new St.BoxLayout({
-            orientation: Clutter.Orientation.VERTICAL,
+            ...VERTICAL,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.START,
             style_class: 'gamebar-volume-container-global'
@@ -45,7 +53,7 @@ export class SoundControls {
 
         // Create the main volume panel
         let volumePanel = new St.BoxLayout({
-            orientation: Clutter.Orientation.HORIZONTAL,
+            ...HORIZONTAL,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.CENTER
         });
@@ -73,7 +81,7 @@ export class SoundControls {
 
         // Create a box for app-specific volume controls
         this._appVolumesBox = new St.BoxLayout({
-            orientation: Clutter.Orientation.VERTICAL,
+            ...VERTICAL,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.START,
         });
@@ -137,7 +145,7 @@ export class SoundControls {
         
             // Create a box for label and volumeBox
             let labelBox = new St.BoxLayout({
-                orientation: Clutter.Orientation.VERTICAL,
+                ...VERTICAL,
                 x_align: Clutter.ActorAlign.START,
                 y_align: Clutter.ActorAlign.START
             });
@@ -252,7 +260,7 @@ export class SoundControls {
     _createAppVolumeControl(stream) {
         let container = new St.BoxLayout({
             style_class: 'gamebar-app-volume-control',
-            orientation: Clutter.Orientation.HORIZONTAL,
+            ...HORIZONTAL,
             x_align: Clutter.ActorAlign.START,
             y_align: Clutter.ActorAlign.CENTER
         });

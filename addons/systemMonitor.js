@@ -3,6 +3,14 @@ import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
 import { getPositionStyle, readFile, getGpuDriver, listGpus, findCpuHwmon, findFirstHwmon, celsiusToFahrenheit } from '../utils.js';
 
+const VERTICAL = 'orientation' in St.BoxLayout.prototype
+    ? { orientation: Clutter.Orientation.VERTICAL }
+    : { vertical: true };
+
+const HORIZONTAL = 'orientation' in St.BoxLayout.prototype
+    ? { orientation: Clutter.Orientation.HORIZONTAL }
+    : { vertical: false };
+
 // Import GTop conditionally
 let GTop = null;
 try {
@@ -52,12 +60,12 @@ export class SystemMonitor {
         });
 
         this._systemMonitorContainer = new St.BoxLayout({
-          orientation: Clutter.Orientation.HORIZONTAL
+          ...HORIZONTAL
         });
 
         // Create a container for CPU stats
         this._cpuContainer = new St.BoxLayout({
-            orientation: Clutter.Orientation.VERTICAL,
+            ...VERTICAL,
             style_class: 'gamebar-monitor-container'
         });
 
@@ -88,7 +96,7 @@ export class SystemMonitor {
         if (this._gpuMonitoring) {
             // Create a container for GPU stats
             this._gpuContainer = new St.BoxLayout({
-              orientation: Clutter.Orientation.VERTICAL,
+              ...VERTICAL,
               style_class: 'gamebar-monitor-container'
           });
 
